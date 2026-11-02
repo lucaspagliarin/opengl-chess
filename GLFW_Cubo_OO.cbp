@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="GLFW_Cubo_OO" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/GLFW_Cubo_OO" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="/home/krohn/glfw-3.3.2/deps" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add library="/usr/lib/x86_64-linux-gnu/libglfw.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libGL.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libGLEW.so" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/GLFW_Cubo_OO" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="include/Application.h" />
+		<Unit filename="include/Banrisul.h" />
+		<Unit filename="include/Cube.h" />
+		<Unit filename="include/Mesh.h" />
+		<Unit filename="include/Object.h" />
+		<Unit filename="include/Prisma.h" />
+		<Unit filename="include/Shader.h" />
+		<Unit filename="include/Texture.h" />
+		<Unit filename="include/stb_image.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/Application.cpp" />
+		<Unit filename="src/Banrisul.cpp" />
+		<Unit filename="src/Cube.cpp" />
+		<Unit filename="src/Mesh.cpp" />
+		<Unit filename="src/Object.cpp" />
+		<Unit filename="src/Prisma.cpp" />
+		<Unit filename="src/Texture.cpp" />
+		<Unit filename="src/stb_image.cpp" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
