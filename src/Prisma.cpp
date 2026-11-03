@@ -1,47 +1,42 @@
-// Prisma.cpp
+
 #include "Prisma.h"
 
+// Prisma triangular: duas bases triangulares e tres faces retangulares.
+// Eixo de comprimento: Z.
+// Altura: eixo Y.
+// Largura: eixo X.
+
 float verticesPrisma[] = {
-    // positions          // tex coords
-    // back face
-   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
-   -0.5f,  0.5f, -0.5f,  0.0f, 0.0f,
-    // front face
-   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    // left face
-   -0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-   -0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
-   -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-   -0.5f, -0.5f,  0.5f,  0.0f, 1.0f,
-    // right face
-    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  0.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 1.0f,
-    // top face
-   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-   -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    // bottom face
-   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 1.0f,
-   -0.5f, -0.5f,  0.5f,  0.0f, 1.0f
+    // Face frontal (Z positivo)
+    // pos X, Y, Z       // UV
+    -0.5f, -0.5f,  0.5f,  0.0f, 1.0f, // 0 - base esquerda
+     0.5f, -0.5f,  0.5f,  1.0f, 1.0f, // 1 - base direita
+     0.0f,  0.5f,  0.5f,  0.5f, 0.0f, // 2 - topo
+
+    // Face traseira (Z negativo)
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // 3
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f, // 4
+     0.0f,  0.5f, -0.5f,  0.5f, 0.0f  // 5
 };
 
 unsigned int indicesPrisma[] = {
-    0,1,2, 2,3,0,        // back
-    4,5,6, 6,7,4,        // front
-    8,9,10, 10,11,8,     // left
-    12,13,14, 14,15,12,  // right
-    16,17,18, 18,19,16,  // top
-    20,21,22, 22,23,20   // bottom
+    // Triangulo frontal
+    0, 1, 2,
+
+    // Triangulo traseiro (orientacao invertida)
+    5, 4, 3,
+
+    // Face inferior
+    3, 4, 1,
+    1, 0, 3,
+
+    // Face lateral esquerda
+    3, 0, 2,
+    2, 5, 3,
+
+    // Face lateral direita
+    1, 4, 5,
+    5, 2, 1
 };
 
 Prisma::Prisma(
@@ -66,16 +61,33 @@ void Prisma::init() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesPrisma), verticesPrisma, GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(verticesPrisma),
+        verticesPrisma,
+        GL_STATIC_DRAW
+    );
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesPrisma), indicesPrisma, GL_STATIC_DRAW);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        sizeof(indicesPrisma),
+        indicesPrisma,
+        GL_STATIC_DRAW
+    );
 
-    // position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    // Posicao
+    glVertexAttribPointer(
+        0, 3, GL_FLOAT, GL_FALSE,
+        5 * sizeof(float), (void*)0
+    );
     glEnableVertexAttribArray(0);
-    // tex coords
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    // Coordenadas de textura
+    glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE,
+        5 * sizeof(float), (void*)(3 * sizeof(float))
+    );
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
@@ -101,6 +113,11 @@ void Prisma::draw(Shader& shader, glm::mat4 parentTransform)
     shader.setMat4("model", model);
 
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glDrawElements(
+        GL_TRIANGLES,
+        sizeof(indicesPrisma) / sizeof(indicesPrisma[0]),
+        GL_UNSIGNED_INT,
+        0
+    );
     glBindVertexArray(0);
 }

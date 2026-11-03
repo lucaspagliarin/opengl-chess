@@ -1151,7 +1151,7 @@
 	<glm/gtc/matrix_transform.hpp>
 	<glm/gtc/type_ptr.hpp>
 
-1793658174 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\prisma.cpp
+1793718518 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\prisma.cpp
 	"Prisma.h"
 
 1793658126 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\prisma.h
@@ -1266,7 +1266,7 @@
 	"Cylinder.h"
 	"Sphere.h"
 
-1793659849 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\king.cpp
+1793665974 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\king.cpp
 	"King.h"
 
 1793665775 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\king.h
@@ -1275,11 +1275,13 @@
 	"Sphere.h"
 	"Cube.h"
 
-1793660041 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\knight.cpp
+1793719900 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\knight.cpp
 	"Knight.h"
 
-1793665777 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\knight.h
+1793719676 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\knight.h
 	"Group.h"
 	"Cylinder.h"
 	"Pyramid.h"
+	"Prisma.h"
+	"Cube.h"
 

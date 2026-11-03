@@ -47,7 +47,6 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="include/Application.h" />
-		<Unit filename="include/Banrisul.h" />
 		<Unit filename="include/Bishop.h" />
 		<Unit filename="include/Cube.h" />
 		<Unit filename="include/Cylinder.h">
@@ -69,7 +68,6 @@
 		<Unit filename="include/stb_image.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Application.cpp" />
-		<Unit filename="src/Banrisul.cpp" />
 		<Unit filename="src/Bishop.cpp" />
 		<Unit filename="src/Cube.cpp" />
 		<Unit filename="src/Cylinder.cpp" />

@@ -3,6 +3,8 @@
 #include "Group.h"
 #include "Cylinder.h"
 #include "Pyramid.h"
+#include "Prisma.h"
+#include "Cube.h"
 
 class Knight : public Group {
 public:
@@ -14,8 +16,9 @@ public:
 private:
     Cylinder base;
 
-    Pyramid neck;
-    Pyramid head;
+    Cylinder body;
+
+    Cube head;
 
     Pyramid earLeft;
     Pyramid earRight;

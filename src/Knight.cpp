@@ -1,43 +1,50 @@
 
-
 #include "Knight.h"
 
 Knight::Knight(glm::vec3 pos, glm::vec4 color)
     : Group(pos),
+
+      // Base da peca
       base(
           glm::vec3(0.0f, 0.10f, 0.0f),
-          0.32f, 0.32f, 0.20f, 32, color
+          0.32f, 0.32f, 0.20f,
+          32, color
       ),
-      neck(
-          glm::vec3(0.0f, 0.43f, 0.0f),
-          0.42f, 0.55f, color
+
+      // Corpo afunilado
+      body(
+          glm::vec3(0.0f, 0.55f, 0.0f),
+          0.22f, 0.1f, 0.70f,
+          32, color
       ),
+
+      // Cabeca
       head(
-          glm::vec3(0.0f, 0.76f, 0.0f),
-          0.34f, 0.38f, color
+          glm::vec3(0.0f, 0.91f, 0.08f),
+          glm::vec3(0.0f, 0.0f, 0.0f),
+          glm::vec3(0.24f, 0.22f, 0.40f),
+          0.0f,
+          color,
+          true
       ),
+
+      // Orelhas
       earLeft(
-          glm::vec3(-0.10f, 1.00f, 0.0f),
-          0.12f, 0.22f, color
+          glm::vec3(-0.08f, 1.08f, -0.04f),
+          0.10f,
+          0.18f,
+          color
       ),
+
       earRight(
-          glm::vec3(0.10f, 1.00f, 0.0f),
-          0.12f, 0.22f, color
+          glm::vec3(0.08f, 1.08f, -0.04f),
+          0.10f,
+          0.18f,
+          color
       )
 {
-    // Inclina a cabeça para a frente.
-    head.rotation = glm::vec3(0.0f, 0.0f, 1.0f);
-    head.angle = 20.0f;
-
-    // Inclina ligeiramente as orelhas.
-    earLeft.rotation = glm::vec3(0.0f, 0.0f, 1.0f);
-    earLeft.angle = -10.0f;
-
-    earRight.rotation = glm::vec3(0.0f, 0.0f, 1.0f);
-    earRight.angle = 10.0f;
-
     addChild(&base);
-    addChild(&neck);
+    addChild(&body);
     addChild(&head);
     addChild(&earLeft);
     addChild(&earRight);
