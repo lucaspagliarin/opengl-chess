@@ -16,5 +16,9 @@ public:
 private:
     Cylinder base;
     Cylinder body;
-    Sphere head;
+    Cylinder collar;
+    Group head;
+    Cylinder head_bottom;
+    Sphere head_sphere;
+    Sphere tip;
 };

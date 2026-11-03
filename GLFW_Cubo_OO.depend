@@ -186,7 +186,7 @@
 1793643718 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\mesh.h
 	<GL/glew.h>
 
-1793661304 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\main.cpp
+1793665372 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\main.cpp
 	<GL/glew.h>
 	<GLFW/glfw3.h>
 	<glm/glm.hpp>
@@ -1230,7 +1230,7 @@
 	"Object.h"
 	<vector>
 
-1793660202 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\pawn.cpp
+1793662450 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\pawn.cpp
 	"Pawn.h"
 
 1793662317 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\pawn.h
@@ -1256,10 +1256,12 @@
 	"Cylinder.h"
 	"Sphere.h"
 
-1793659637 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\queen.cpp
+1793665023 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\queen.cpp
 	"Queen.h"
+	"Cylinder.h"
+	"Sphere.h"
 
-1793659624 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\queen.h
+1793664790 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\queen.h
 	"Group.h"
 	"Cylinder.h"
 	"Sphere.h"
@@ -1267,7 +1269,7 @@
 1793659849 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\king.cpp
 	"King.h"
 
-1793659817 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\king.h
+1793665775 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\king.h
 	"Group.h"
 	"Cylinder.h"
 	"Sphere.h"
@@ -1276,7 +1278,7 @@
 1793660041 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\knight.cpp
 	"Knight.h"
 
-1793660027 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\knight.h
+1793665777 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\knight.h
 	"Group.h"
 	"Cylinder.h"
 	"Pyramid.h"

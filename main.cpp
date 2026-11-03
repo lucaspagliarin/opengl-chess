@@ -85,46 +85,83 @@ int main() {
     teste.position = glm::vec3(0.0f, 0.0f, 0.0f);
     teste.rotation = glm::vec3(0.4f, 1.0f,0.0f);
     teste.angle = 45.0f;
-    teste.scale = glm::vec3(2.0f);
+    teste.scale = glm::vec3(1.4f);
 
     Pawn peao1(
-        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f),
         glm::vec4(0.9f, 0.9f, 0.9f, 1.0f)
     );
 
     Bishop bispo(
-        glm::vec3(-1.0f, 0.0f, 0.0f),
+        glm::vec3(-1.0f, 0.0f, 1.0f),
         glm::vec4(0.9f, 0.9f, 0.9f, 1.0f)
     );
 
     Rook torre(
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec4(0.1f, 0.1f, 0.1f, 1.0f)
+        glm::vec3(1.0f, 0.0f, 1.0f),
+        glm::vec4(0.9f, 0.9f, 0.9f, 1.0f)
     );
 
     Queen queen(
-        glm::vec3(2.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 0.0f, 1.0f),
         glm::vec4(0.9f, 0.9f, 0.9f, 1.0f)
     );
 
     King king(
-        glm::vec3(-2.0f, 0.0f, 0.0f),
+        glm::vec3(-2.0f, 0.0f, 1.0f),
         glm::vec4(0.9f, 0.9f, 0.9f, 1.0f)
     );
 
     Knight knight(
-        glm::vec3(3.0f, 0.0f, 0.0f),
+        glm::vec3(3.0f, 0.0f, 1.0f),
         glm::vec4(0.9f, 0.9f, 0.9f, 1.0f)
     );
 
-  teste.addChild(&peao1);
-   teste.addChild(&bispo);
+    teste.addChild(&peao1);
+    teste.addChild(&bispo);
     teste.addChild(&torre);
-   teste.addChild(&queen);
-   teste.addChild(&king);
-   teste.addChild(&knight);
+    teste.addChild(&queen);
+    teste.addChild(&king);
+    teste.addChild(&knight);
 
     //rook.scale = glm::vec3(2.0f);
+
+    Pawn peaob(
+        glm::vec3(0.0f, 0.0f, -1.0f),
+        glm::vec4(0.16f, 0.16f, 0.16f, 1.0f)
+    );
+
+    Bishop bispob(
+        glm::vec3(-1.0f, 0.0f, -1.0f),
+        glm::vec4(0.16f, 0.16f, 0.16f, 1.0f)
+    );
+
+    Rook torreb(
+        glm::vec3(1.0f, 0.0f, -1.0f),
+        glm::vec4(0.16f, 0.16f, 0.16f, 1.0f)
+    );
+
+    Queen queenb(
+        glm::vec3(2.0f, 0.0f, -1.0f),
+        glm::vec4(0.16f, 0.16f, 0.16f, 1.0f)
+    );
+
+    King kingb(
+        glm::vec3(-2.0f, 0.0f, -1.0f),
+        glm::vec4(0.16f, 0.16f, 0.16f, 1.0f)
+    );
+
+    Knight knightb(
+        glm::vec3(3.0f, 0.0f, -1.0f),
+        glm::vec4(0.16f, 0.16f, 0.16f, 1.0f)
+    );
+
+    teste.addChild(&peaob);
+    teste.addChild(&bispob);
+    teste.addChild(&torreb);
+    teste.addChild(&queenb);
+    teste.addChild(&kingb);
+    teste.addChild(&knightb);
 
 
 
