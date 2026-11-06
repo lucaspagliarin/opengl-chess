@@ -19,11 +19,52 @@
 #include <Texture.h>
 #include <Board.h>
 #include <iostream>
+//globais
+float globalXOffset=0.0f;
+float globalYOffset=0.0f;
+bool mouseAtivo = false;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (!mouseAtivo) return;
+
+    static float lastX = 512.0f;
+    static float lastY = 384.0f;
+    static bool firstMouse = true;
+
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.005f;
+
+    globalXOffset = xoffset * sensitivity;
+    globalYOffset = yoffset * sensitivity;
+}
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        std::cout << "Botão esquerdo clicado!" << std::endl;
+
+        // Aqui dentro você pode pegar a posição atual do cursor na tela
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        std::cout << "X: " << xpos << " | Y: " << ypos << std::endl;
+    }
+}
 
 int main() {
     // Cria janela e inicializa OpenGL
     Application app(1024, 768, "Cubos OOP");
     if (!app.init()) return -1;
+
+    glfwSetCursorPosCallback(app.getWindow(), mouse_callback);
+    glfwSetMouseButtonCallback(app.getWindow(), mouse_button_callback);
 
     // Shader
     Shader shader("vertex.glsl", "fragment.glsl");
@@ -168,17 +209,28 @@ Pawn* bPawns[8];
     // Ativa depth test
     glEnable(GL_DEPTH_TEST);
 
-    glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 12.0f);
 
-// Para onde a câmera está olhando fixamente (ex: o centro do tabuleiro em {0, 0, 0})
+glm::vec3 cameraPos = glm::vec3(0.0f, 7.0f, 12.0f);
 glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-
-// Vetor "para cima" da câmera
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::mat4 view;
+
 
 // Velocidade de movimento da câmera
-float cameraSpeed = 0.1f;
-int linha = 6;
+float cameraSpeed = 0.2f;
+float t = 0.0f;
+float velocidade = 0.02f;
+bool emPrimeiraPessoa = false;
+bool estaTransicionando = false;
+bool pKeyPressionadaUltimoFrame = false;
+bool mKeyPressionadaUltimoFrame = false;
+Object* obj_Selected=nullptr;
+
+
+glm::vec3 cameraPosInicial = glm::vec3(0.0f);
+glm::vec3 cameraPosDestino = glm::vec3(0.0f);
+glm::vec3 cameraTargetInicial= glm::vec3(0.0f);
+
     // Loop principal
     while (!glfwWindowShouldClose(app.getWindow())) {
         // Processa input
@@ -193,7 +245,6 @@ int linha = 6;
         shader.use();
 
         glm::mat4 model = glm::mat4(1.0f);
-        float angle = 20.0f;
         //model = glm::rotate(model, (angle * (float) glfwGetTime()) / 20, glm::vec3(0.0f, 0.3f, 0.0f));
         //model = glm::rotate(model, -60.0f, glm::vec3(0.0f, 0.3f, 0.0f));
 
@@ -203,10 +254,166 @@ int linha = 6;
         glm::mat4 projection = glm::perspective(glm::radians(45.0f),
                                                 800.0f / 600.0f,
                                                 0.1f, 100.0f);
-        float deltaTime = 0.05f; // ou calcule o deltaTime real do GLFW se já tiver
+    bool mouseLeftPressed = (glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+        static bool clickUltimoFrame = false;
 
-        // Movimento lateral (Esquerda / Direita com A e D)
-        // Calculamos o vetor "Right" cruzando a direção da visão com o Up
+        if (mouseLeftPressed && !clickUltimoFrame) {
+            double mouseX, mouseY;
+            glfwGetCursorPos(app.getWindow(), &mouseX, &mouseY);
+
+            int larguraInt, alturaInt;
+            glfwGetWindowSize(app.getWindow(), &larguraInt, &alturaInt);
+
+        float larguraJanela = static_cast<float>(larguraInt);
+        float alturaJanela = static_cast<float>(alturaInt);
+
+        float x_ndc = 2.0f * static_cast<float>(mouseX) / larguraJanela - 1.0f;
+        float y_ndc = 1.0f - (2.0f * static_cast<float>(mouseY) / alturaJanela);
+        std::cout << "Mouse Pixels -> X: " << mouseX << " | Y: " << mouseY<< "  ||  NDC -> X_ndc: " << x_ndc << " | Y_ndc: " << y_ndc << std::endl;
+
+    glm::vec4 ray_clip_near = glm::vec4(x_ndc, y_ndc, -1.0f, 1.0f);
+    glm::vec4 ray_clip_far  = glm::vec4(x_ndc, y_ndc,  1.0f, 1.0f);
+
+    // 4. Inverte a matriz (Projection * View) para trazer para o Mundo
+    glm::mat4 invMatriz = glm::inverse(projection * view);
+
+    glm::vec4 ray_world_near = invMatriz * ray_clip_near;
+    glm::vec4 ray_world_far  = invMatriz * ray_clip_far;
+
+    // Normalização homogênea (divide pelo W)
+    if (ray_world_near.w != 0.0f) ray_world_near /= ray_world_near.w;
+    if (ray_world_far.w  != 0.0f) ray_world_far  /= ray_world_far.w;
+
+    glm::vec3 pNear = glm::vec3(ray_world_near);
+    glm::vec3 pFar  = glm::vec3(ray_world_far);
+
+    // 5. Acha a direção do raio e faz a intersecção com o plano Y = 0
+    glm::vec3 direcaoRaio = glm::normalize(pFar - pNear);
+
+    // Evita divisão por zero caso o raio esteja perfeitamente paralelo ao plano
+    if (std::abs(direcaoRaio.y) > 0.0001f) {
+        float t = -pNear.y / direcaoRaio.y;
+        glm::vec3 pontoNoTabuleiro = pNear + (direcaoRaio * t);
+
+        // 6. Traduz o X e Z do mundo para os índices da sua matriz de xadrez [i][j]
+        float startX = -3.5f;
+        float startZ = -3.5f;
+
+        int j = static_cast<int>(std::floor(pontoNoTabuleiro.x - startX + 0.5f)); // Coluna
+        int i = static_cast<int>(std::floor(pontoNoTabuleiro.z - startZ + 0.5f)); // Linha
+
+        if (i >= 0 && i < 8 && j >= 0 && j < 8) {
+            std::cout << "Casa clicada -> Linha (i): " << i << " | Coluna (j): " << j << std::endl;
+        } else {
+            std::cout << "Clicou fora do tabuleiro!" << std::endl;
+        }
+       }
+        }
+        clickUltimoFrame=mouseLeftPressed;
+
+        float deltaTime = 0.016f;
+
+    bool pKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_P) == GLFW_PRESS);
+
+    if (pKeyTriggered && !pKeyPressionadaUltimoFrame && !estaTransicionando) {
+        emPrimeiraPessoa = !emPrimeiraPessoa;
+        estaTransicionando = true;
+
+        if (emPrimeiraPessoa) {
+            cameraPosInicial = cameraPos;
+            cameraPosDestino = glm::vec3(-5.0f, 0.8f, 0.0f);
+            t=0.0f;
+        }
+        else {
+            cameraPosInicial = glm::vec3(0.0f, 7.0f, 12.0f);
+            cameraPosDestino = cameraPos;
+            cameraTargetInicial = cameraTarget;
+            t=1.0f;
+        }
+
+        if (mouseAtivo) {
+            mouseAtivo = false;
+            glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+    }
+
+    pKeyPressionadaUltimoFrame = pKeyTriggered;
+
+    if (estaTransicionando) {
+        if (emPrimeiraPessoa) {
+            t += velocidade * deltaTime;
+            if (t >= 1.0f) {
+                t = 1.0f;
+                estaTransicionando = false;
+            }
+        }
+        else {
+            t -= velocidade * deltaTime;
+            if (t <= 0.0f) {
+                t = 0.0f;
+                estaTransicionando = false;
+            }
+        }
+    }
+
+    if (estaTransicionando) {
+        float fatorCurva = log(1.0f + t * (2.71828f - 1.0f));
+
+        cameraPos = glm::mix(cameraPosInicial, cameraPosDestino, fatorCurva);
+        if(!emPrimeiraPessoa){
+            glm::vec3 targetFinal = glm::vec3(0.0f, 0.0f, 0.0f);
+            cameraTarget = glm::mix(targetFinal, cameraTargetInicial, fatorCurva);
+        }
+
+    }
+    bool mKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_M) == GLFW_PRESS);
+        if (mKeyTriggered && !mKeyPressionadaUltimoFrame) {
+            mouseAtivo = !mouseAtivo;
+            if (mouseAtivo) {
+                glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            } else {
+                glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+        }
+        mKeyPressionadaUltimoFrame = mKeyTriggered;
+
+        if(emPrimeiraPessoa && !estaTransicionando){
+
+            glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
+            glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
+
+            if (mouseAtivo && (globalXOffset != 0.0f || globalYOffset != 0.0f)) {
+
+                glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), -globalXOffset, glm::vec3(0.0f, 1.0f, 0.0f));
+                direction = glm::vec3(rotX * glm::vec4(direction, 0.0f));
+
+                glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), globalYOffset, right);
+                direction = glm::vec3(rotY * glm::vec4(direction, 0.0f));
+
+                direction = glm::normalize(direction);
+
+                globalXOffset = 0.0f;
+                globalYOffset = 0.0f;
+            }
+
+            float speedFP = 0.3f * deltaTime;
+            glm::vec3 moveDirXZ = glm::normalize(glm::vec3(direction.x, 0.0f, direction.z));
+
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+                cameraPos += moveDirXZ * speedFP;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+                cameraPos -= moveDirXZ * speedFP;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+                cameraPos -= right * speedFP;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+                cameraPos += right * speedFP;
+
+
+            cameraPos.y = 0.8f;
+            cameraTarget = cameraPos + direction;
+
+        }
+        else if (!estaTransicionando){
         glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
         glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
 
@@ -214,33 +421,18 @@ int linha = 6;
             cameraPos -= right * cameraSpeed * deltaTime;
         if (glfwGetKey(app.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
             cameraPos += right * cameraSpeed * deltaTime;
-
-        // Movimento vertical (Cima / Baixo com W e S no eixo Y do mundo ou relativo)
-        // Se quiser subir/descer reto no eixo Y:
         if (glfwGetKey(app.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
             cameraPos.y += cameraSpeed * deltaTime;
         if (glfwGetKey(app.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
             cameraPos.y -= cameraSpeed * deltaTime;
-
-        // Opcional: Zoom aproximar / afastar (com as setas Cima / Baixo por exemplo)
         if (glfwGetKey(app.getWindow(), GLFW_KEY_UP) == GLFW_PRESS)
             cameraPos += direction * cameraSpeed * deltaTime;
         if (glfwGetKey(app.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
             cameraPos -= direction * cameraSpeed * deltaTime;
-            glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+        }
+        view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-        //teste movimento
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_1) == GLFW_PRESS)
-        {
-            linha=5;
-            tabuleiro.setPieceAt(linha,0,wPawns[0]);
-        }
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_2) == GLFW_PRESS)
-        {
-            linha=4;
-            tabuleiro.setPieceAt(linha,0,wPawns[0]);
-        }
 
         // Bind texturas
         tex1.bind(0);
