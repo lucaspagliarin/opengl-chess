@@ -19,26 +19,31 @@
 #include <Texture.h>
 #include <Board.h>
 #include <iostream>
+
 //globais
-float globalXOffset=0.0f;
-float globalYOffset=0.0f;
+float globalXOffset = 0.0f;
+float globalYOffset = 0.0f;
+
 bool mouseAtivo = false;
+bool firstMouse = true;
+
+float lastX = 512.0f;
+float lastY = 384.0f;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (!mouseAtivo) return;
 
-    static float lastX = 512.0f;
-    static float lastY = 384.0f;
-    static bool firstMouse = true;
+    if (!mouseAtivo) return;
 
     if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
+        return;
     }
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos;
+
     lastX = xpos;
     lastY = ypos;
 
@@ -47,6 +52,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     globalXOffset = xoffset * sensitivity;
     globalYOffset = yoffset * sensitivity;
 }
+
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         std::cout << "Botão esquerdo clicado!" << std::endl;
@@ -56,6 +62,119 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         glfwGetCursorPos(window, &xpos, &ypos);
         std::cout << "X: " << xpos << " | Y: " << ypos << std::endl;
     }
+}
+
+std::pair<int, int> getBoardCoords(double mouseX, double mouseY, int larguraInt, int alturaInt, glm::mat4 projection, glm::mat4 view) {
+
+    float larguraJanela = static_cast<float>(larguraInt);
+    float alturaJanela = static_cast<float>(alturaInt);
+
+    float x_ndc = 2.0f * static_cast<float>(mouseX) / larguraJanela - 1.0f;
+    float y_ndc = 1.0f - (2.0f * static_cast<float>(mouseY) / alturaJanela);
+
+    // std::cout << "Mouse Pixels -> X: " << mouseX << " | Y: " << mouseY<< "  ||  NDC -> X_ndc: " << x_ndc << " | Y_ndc: " << y_ndc << std::endl;
+
+
+    glm::vec4 ray_clip_near = glm::vec4(x_ndc, y_ndc, -1.0f, 1.0f);
+    glm::vec4 ray_clip_far  = glm::vec4(x_ndc, y_ndc,  1.0f, 1.0f);
+
+    // 4. Inverte a matriz (Projection * View) para trazer para o Mundo
+    glm::mat4 invMatriz = glm::inverse(projection * view);
+
+    glm::vec4 ray_world_near = invMatriz * ray_clip_near;
+    glm::vec4 ray_world_far  = invMatriz * ray_clip_far;
+
+    // Normalização homogênea (divide pelo W)
+    if (ray_world_near.w != 0.0f) ray_world_near /= ray_world_near.w;
+    if (ray_world_far.w  != 0.0f) ray_world_far  /= ray_world_far.w;
+
+    glm::vec3 pNear = glm::vec3(ray_world_near);
+    glm::vec3 pFar  = glm::vec3(ray_world_far);
+
+
+    // 5. Acha a direção do raio e faz a intersecção com o plano Y = 0
+    glm::vec3 direcaoRaio = glm::normalize(pFar - pNear);
+
+    int j = -1;
+    int i = -1;
+
+    // Evita divisão por zero caso o raio esteja perfeitamente paralelo ao plano
+    if (std::abs(direcaoRaio.y) > 0.0001f) {
+        float t = -pNear.y / direcaoRaio.y;
+        glm::vec3 pontoNoTabuleiro = pNear + (direcaoRaio * t);
+
+        // 6. Traduz o X e Z do mundo para os índices da sua matriz de xadrez [i][j]
+        float startX = -3.5f;
+        float startZ = -3.5f;
+
+        j = static_cast<int>(std::floor(pontoNoTabuleiro.x - startX + 0.5f)); // Coluna
+        i = static_cast<int>(std::floor(pontoNoTabuleiro.z - startZ + 0.5f)); // Linha
+    }
+
+    return {i, j};
+
+}
+
+std::pair<double, double> getMousePosition(GLFWwindow* window, bool mouseAtivo) {
+
+    int largura, altura;
+    glfwGetWindowSize(window, &largura, &altura);
+
+    if (mouseAtivo) {
+        return {
+            largura / 2.0,
+            altura / 2.0
+        };
+    }
+
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+    return {mouseX, mouseY};
+}
+
+void drawCrosshair()
+{
+    static unsigned int VAO = 0;
+    static unsigned int VBO = 0;
+
+    if (VAO == 0)
+    {
+        // Quatro segmentos formando uma mira
+        float vertices[] = {
+            // Horizontal
+            -0.015f,  0.0f,
+             0.015f,  0.0f,
+
+            // Vertical
+             0.0f, -0.025f,
+             0.0f,  0.025f
+        };
+
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+                              2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+    }
+
+    glBindVertexArray(VAO);
+
+    glDisable(GL_DEPTH_TEST);
+
+    glLineWidth(2.0f);
+
+    glDrawArrays(GL_LINES, 0, 4);
+
+    glEnable(GL_DEPTH_TEST);
+
+    glBindVertexArray(0);
 }
 
 int main() {
@@ -68,6 +187,8 @@ int main() {
 
     // Shader
     Shader shader("vertex.glsl", "fragment.glsl");
+    Shader crosshairShader("crosshair_vertex.glsl", "crosshair_fragment.glsl");
+
     shader.use();
 
     // Carrega texturas
@@ -215,6 +336,8 @@ glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::mat4 view;
 
+view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+
 
 // Velocidade de movimento da câmera
 float speedFP = 4.0f ; // wasd primeira pessoa
@@ -257,62 +380,7 @@ float lastFrame = 0.0f;
         glm::mat4 projection = glm::perspective(glm::radians(45.0f),
                                                 800.0f / 600.0f,
                                                 0.1f, 100.0f);
-    bool mouseLeftPressed = (glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
-        static bool clickUltimoFrame = false;
 
-        if (mouseLeftPressed && !clickUltimoFrame) {
-            double mouseX, mouseY;
-            glfwGetCursorPos(app.getWindow(), &mouseX, &mouseY);
-
-            int larguraInt, alturaInt;
-            glfwGetWindowSize(app.getWindow(), &larguraInt, &alturaInt);
-
-        float larguraJanela = static_cast<float>(larguraInt);
-        float alturaJanela = static_cast<float>(alturaInt);
-
-        float x_ndc = 2.0f * static_cast<float>(mouseX) / larguraJanela - 1.0f;
-        float y_ndc = 1.0f - (2.0f * static_cast<float>(mouseY) / alturaJanela);
-        std::cout << "Mouse Pixels -> X: " << mouseX << " | Y: " << mouseY<< "  ||  NDC -> X_ndc: " << x_ndc << " | Y_ndc: " << y_ndc << std::endl;
-
-    glm::vec4 ray_clip_near = glm::vec4(x_ndc, y_ndc, -1.0f, 1.0f);
-    glm::vec4 ray_clip_far  = glm::vec4(x_ndc, y_ndc,  1.0f, 1.0f);
-
-    // 4. Inverte a matriz (Projection * View) para trazer para o Mundo
-    glm::mat4 invMatriz = glm::inverse(projection * view);
-
-    glm::vec4 ray_world_near = invMatriz * ray_clip_near;
-    glm::vec4 ray_world_far  = invMatriz * ray_clip_far;
-
-    // Normalização homogênea (divide pelo W)
-    if (ray_world_near.w != 0.0f) ray_world_near /= ray_world_near.w;
-    if (ray_world_far.w  != 0.0f) ray_world_far  /= ray_world_far.w;
-
-    glm::vec3 pNear = glm::vec3(ray_world_near);
-    glm::vec3 pFar  = glm::vec3(ray_world_far);
-
-    // 5. Acha a direção do raio e faz a intersecção com o plano Y = 0
-    glm::vec3 direcaoRaio = glm::normalize(pFar - pNear);
-
-    // Evita divisão por zero caso o raio esteja perfeitamente paralelo ao plano
-    if (std::abs(direcaoRaio.y) > 0.0001f) {
-        float t = -pNear.y / direcaoRaio.y;
-        glm::vec3 pontoNoTabuleiro = pNear + (direcaoRaio * t);
-
-        // 6. Traduz o X e Z do mundo para os índices da sua matriz de xadrez [i][j]
-        float startX = -3.5f;
-        float startZ = -3.5f;
-
-        int j = static_cast<int>(std::floor(pontoNoTabuleiro.x - startX + 0.5f)); // Coluna
-        int i = static_cast<int>(std::floor(pontoNoTabuleiro.z - startZ + 0.5f)); // Linha
-
-        if (i >= 0 && i < 8 && j >= 0 && j < 8) {
-            std::cout << "Casa clicada -> Linha (i): " << i << " | Coluna (j): " << j << std::endl;
-        } else {
-            std::cout << "Clicou fora do tabuleiro!" << std::endl;
-        }
-       }
-        }
-        clickUltimoFrame=mouseLeftPressed;
 
     float currentFrame = glfwGetTime();
 
@@ -373,53 +441,64 @@ float lastFrame = 0.0f;
         }
 
     }
+
     bool mKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_M) == GLFW_PRESS);
-        if (mKeyTriggered && !mKeyPressionadaUltimoFrame) {
-            mouseAtivo = !mouseAtivo;
-            if (mouseAtivo) {
-                glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            } else {
-                glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            }
+
+    if (mKeyTriggered && !mKeyPressionadaUltimoFrame
+        && emPrimeiraPessoa && !estaTransicionando) {
+
+        mouseAtivo = !mouseAtivo;
+
+        // Reinicia os deslocamentos acumulados
+        globalXOffset = 0.0f;
+        globalYOffset = 0.0f;
+        firstMouse = true;
+
+        if (mouseAtivo) {
+            glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        } else {
+            glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
-        mKeyPressionadaUltimoFrame = mKeyTriggered;
+    }
 
-        if(emPrimeiraPessoa && !estaTransicionando){
+    mKeyPressionadaUltimoFrame = mKeyTriggered;
 
-            glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
-            glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
+    if(emPrimeiraPessoa && !estaTransicionando){
 
-            if (mouseAtivo && (globalXOffset != 0.0f || globalYOffset != 0.0f)) {
+        glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
+        glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
 
-                glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), -globalXOffset, glm::vec3(0.0f, 1.0f, 0.0f));
-                direction = glm::vec3(rotX * glm::vec4(direction, 0.0f));
+        if (mouseAtivo && (globalXOffset != 0.0f || globalYOffset != 0.0f)) {
 
-                glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), globalYOffset, right);
-                direction = glm::vec3(rotY * glm::vec4(direction, 0.0f));
+            glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), -globalXOffset, glm::vec3(0.0f, 1.0f, 0.0f));
+            direction = glm::vec3(rotX * glm::vec4(direction, 0.0f));
 
-                direction = glm::normalize(direction);
+            glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), globalYOffset, right);
+            direction = glm::vec3(rotY * glm::vec4(direction, 0.0f));
 
-                globalXOffset = 0.0f;
-                globalYOffset = 0.0f;
-            }
+            direction = glm::normalize(direction);
 
-
-            glm::vec3 moveDirXZ = glm::normalize(glm::vec3(direction.x, 0.0f, direction.z));
-
-            if (glfwGetKey(app.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-                cameraPos += moveDirXZ * speedFP * deltaTime;
-            if (glfwGetKey(app.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-                cameraPos -= moveDirXZ * speedFP * deltaTime;
-            if (glfwGetKey(app.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-                cameraPos -= right * speedFP * deltaTime;
-            if (glfwGetKey(app.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-                cameraPos += right * speedFP * deltaTime;
-
-
-            cameraPos.y = 0.8f;
-            cameraTarget = cameraPos + direction;
-
+            globalXOffset = 0.0f;
+            globalYOffset = 0.0f;
         }
+
+
+        glm::vec3 moveDirXZ = glm::normalize(glm::vec3(direction.x, 0.0f, direction.z));
+
+        if (glfwGetKey(app.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+            cameraPos += moveDirXZ * speedFP * deltaTime;
+        if (glfwGetKey(app.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+            cameraPos -= moveDirXZ * speedFP * deltaTime;
+        if (glfwGetKey(app.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+            cameraPos -= right * speedFP * deltaTime;
+        if (glfwGetKey(app.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+            cameraPos += right * speedFP * deltaTime;
+
+
+        cameraPos.y = 0.8f;
+        cameraTarget = cameraPos + direction;
+
+    }
         else if (!estaTransicionando){
         glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
         glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
@@ -437,15 +516,65 @@ float lastFrame = 0.0f;
         if (glfwGetKey(app.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
             cameraPos -= direction * cameraSpeed * deltaTime;
         }
-        view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+
+    view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+
+    // Posição do mouse ou da mira central
+    auto [mouseX, mouseY] = getMousePosition(app.getWindow(), mouseAtivo);
+
+    int largura, altura;
+    glfwGetWindowSize(app.getWindow(), &largura, &altura);
+
+    // Identifica a casa apontada
+    auto [i, j] = getBoardCoords(
+        mouseX,
+        mouseY,
+        largura,
+        altura,
+        projection,
+        view
+    );
+
+        bool mouseLeftPressed =
+        glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+
+        static bool clickUltimoFrame = false;
+
+        if (mouseLeftPressed && !clickUltimoFrame) {
+
+            if (i >= 0 && i < 8 && j >= 0 && j < 8) {
+                std::cout << "Casa clicada -> Linha: " << i
+                          << " | Coluna: " << j << std::endl;
+            } else {
+                std::cout << "Clicou fora do tabuleiro!" << std::endl;
+            }
+        }
+
+        clickUltimoFrame = mouseLeftPressed;
+
+        // Atualiza o hover
+        tabuleiro.setHoveredSquare(i, j);
+
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
 
         // Bind texturas
         tex1.bind(0);
         //tex2.bind(1);
+
         pecas.draw(shader, model);
         tabuleiro.draw(shader,model);
+
+        // Crosshair
+        if (mouseAtivo)
+        {
+            crosshairShader.use();
+            drawCrosshair();
+
+            shader.use();
+        }
+
+
         // Swap buffers e eventos
         glfwSwapBuffers(app.getWindow());
         glfwPollEvents();

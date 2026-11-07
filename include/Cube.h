@@ -14,6 +14,8 @@ public:
         bool useColor = false
     );
 
+    void setColor(glm::vec4 newColor);
+
     void draw(Shader& shader, glm::mat4 parentTransform) override;
 
 private:

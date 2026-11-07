@@ -18,10 +18,6 @@ Board::Board(glm::vec3 pos, glm::vec4 color)
 
     float tileY = 0.0f;
 
-    // Cores das casas
-    glm::vec4 lightColor(0.9f, 0.85f, 0.70f, 1.0f);
-    glm::vec4 darkColor(0.40f, 0.26f, 0.13f, 1.0f);
-
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             float x = startX + j * tileSize;
@@ -91,3 +87,46 @@ void Board::setupInitialPieces(std::vector<Object*> whitePieces, std::vector<Obj
         setPieceAt(7, j, whitePieces[j]);
     }
 }
+
+void Board::setHoveredSquare(int row, int col) {
+
+    // Verifica se está dentro do tabuleiro
+    if (row < 0 || row >= 8 || col < 0 || col >= 8) {
+        clearHover();
+        return;
+    }
+
+    // Se continua na mesma casa, não precisa atualizar
+    if (row == hoveredRow && col == hoveredCol)
+        return;
+
+    // Restaura a cor da casa anterior
+    clearHover();
+
+    // Aplica a cor azul na nova casa
+    squares[row][col].setColor(hoverColor);
+
+    // Armazena a posição atual
+    hoveredRow = row;
+    hoveredCol = col;
+}
+
+
+void Board::clearHover() {
+
+    if (hoveredRow == -1 || hoveredCol == -1)
+        return;
+
+    // Restaura a cor original considerando o padrão do tabuleiro
+    glm::vec4 originalColor =
+        ((hoveredRow + hoveredCol) % 2 == 0)
+        ? lightColor
+        : darkColor;
+
+    squares[hoveredRow][hoveredCol].setColor(originalColor);
+
+    hoveredRow = -1;
+    hoveredCol = -1;
+}
+
+

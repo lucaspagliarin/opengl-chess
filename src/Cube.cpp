@@ -88,6 +88,10 @@ void Cube::init() {
     glBindVertexArray(0);
 }
 
+void Cube::setColor(glm::vec4 newColor) {
+    color = newColor;
+}
+
 
 void Cube::draw(Shader& shader, glm::mat4 parentTransform)
 {
