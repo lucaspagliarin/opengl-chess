@@ -168,6 +168,15 @@ void Object::updateMovement(float deltaTime)
             break;
     }
 }
+void Object::placeAtWithAnimation(glm::vec3 destination, float duration) {
+    originalPosition = destination;
+    liftHeight = 1.5f;
+
+    position = destination;
+    position.y += liftHeight; // Começa no alto
+
+    startPhase(destination, MovementState::Lowering, duration);
+}
 
 bool Object::isAnimating() const
 {

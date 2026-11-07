@@ -18,10 +18,7 @@ public:
     virtual ~Board();
 
     void setPieceAt(int row, int col, Object* piece);
-    void setupInitialPieces(
-        std::vector<Object*> whitePieces,
-        std::vector<Object*> blackPieces
-    );
+    void setupInitialPieces();
 
     void setHoveredSquare(int row, int col);
     void clearHover();
@@ -49,6 +46,12 @@ private:
     Cube squares[8][8];
 
     Texture* texture = nullptr;
+
+    glm::vec4 whiteColor = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+    glm::vec4 blackColor = glm::vec4(0.16f, 0.16f, 0.16f, 1.0f);
+
+    std::vector<Object*> whitePieces;
+    std::vector<Object*> blackPieces;
 
     int hoveredRow = -1;
     int hoveredCol = -1;

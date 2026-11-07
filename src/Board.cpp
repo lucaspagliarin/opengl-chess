@@ -1,4 +1,10 @@
 #include "Board.h"
+#include <Pawn.h>
+#include <Rook.h>
+#include <Queen.h>
+#include <King.h>
+#include <Knight.h>
+#include <Bishop.h>
 
 Board::Board(glm::vec3 pos, glm::vec4 color)
     : Group(pos),
@@ -31,7 +37,7 @@ Board::Board(glm::vec3 pos, glm::vec4 color)
 
             glm::vec4 tileColor =
                 ((i + j) % 2 == 0) ? lightColor : darkColor;
-
+//cria casas do tabuleiro 'ladrilhos'
             squares[i][j] = Cube(
                 glm::vec3(x, 0.0f, z),
                 glm::vec3(0.0f),
@@ -46,6 +52,70 @@ Board::Board(glm::vec3 pos, glm::vec4 color)
 
             addChild(&squares[i][j]);
         }
+    }
+    // PEÇAS BRANCAS
+    Pawn* wPawns[8];
+    for(int i = 0; i < 8; i++) {
+        wPawns[i] = new Pawn(glm::vec3(0.0f), whiteColor);
+    }
+
+    Bishop* wbispo1 = new Bishop(glm::vec3(0.0f), whiteColor);
+    Bishop* wbispo2 = new Bishop(glm::vec3(0.0f), whiteColor);
+
+    Rook* wtorre1 = new Rook(glm::vec3(0.0f), whiteColor);
+    Rook* wtorre2 = new Rook(glm::vec3(0.0f), whiteColor);
+
+    Queen* wqueen = new Queen(glm::vec3(0.0f), whiteColor);
+
+    King* wking = new King(glm::vec3(0.0f), whiteColor);
+
+    Knight* wknight1 = new Knight(glm::vec3(0.0f), whiteColor);
+    Knight* wknight2 = new Knight(glm::vec3(0.0f), whiteColor);
+
+    wknight1->angle = 180;
+    wknight2->angle = 180;
+
+    whitePieces.push_back(wtorre1);
+    whitePieces.push_back(wknight1);
+    whitePieces.push_back(wbispo1);
+    whitePieces.push_back(wqueen);
+    whitePieces.push_back(wking);
+    whitePieces.push_back(wbispo2);
+    whitePieces.push_back(wknight2);
+    whitePieces.push_back(wtorre2);
+    for(int i = 0; i < 8; i++){
+        whitePieces.push_back(wPawns[i]);
+    }
+
+    //PEÇAS PRETAS
+    Pawn* bPawns[8];
+    for(int i = 0; i < 8; i++) {
+        bPawns[i] = new Pawn(glm::vec3(0.0f), blackColor);
+    }
+
+    Bishop* bbispo1 = new Bishop(glm::vec3(0.0f), blackColor);
+    Bishop* bbispo2 = new Bishop(glm::vec3(0.0f), blackColor);
+
+    Rook* btorre1 = new Rook(glm::vec3(0.0f), blackColor);
+    Rook* btorre2 = new Rook(glm::vec3(0.0f), blackColor);
+
+    Queen* bqueen = new Queen(glm::vec3(0.0f), blackColor);
+
+    King* bking = new King(glm::vec3(0.0f), blackColor);
+
+    Knight* bknight1 = new Knight(glm::vec3(0.0f), blackColor);
+    Knight* bknight2 = new Knight(glm::vec3(0.0f), blackColor);
+
+    blackPieces.push_back(btorre1);
+    blackPieces.push_back(bknight1);
+    blackPieces.push_back(bbispo1);
+    blackPieces.push_back(bqueen);
+    blackPieces.push_back(bking);
+    blackPieces.push_back(bbispo2);
+    blackPieces.push_back(bknight2);
+    blackPieces.push_back(btorre2);
+    for(int i = 0; i < 8; i++){
+        blackPieces.push_back(bPawns[i]);
     }
 }
 
@@ -76,10 +146,7 @@ void Board::setPieceAt(int row, int col, Object* piece)
     }
 }
 
-void Board::setupInitialPieces(
-    std::vector<Object*> whitePieces,
-    std::vector<Object*> blackPieces
-) {
+void Board::setupInitialPieces() {
     for (int j = 0; j < 8; j++) {
         setPieceAt(0, j, blackPieces[j]);
         setPieceAt(1, j, blackPieces[8 + j]);
@@ -90,7 +157,7 @@ void Board::setupInitialPieces(
         setPieceAt(7, j, whitePieces[j]);
     }
 }
-
+//retorna casa
 glm::vec3 Board::getSquarePosition(int row, int col) const
 {
     float x = -3.5f + col;

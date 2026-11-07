@@ -20,7 +20,7 @@ public:
     virtual ~Object() {}
 
     void setMovementEnabled(bool enabled);
-
+    void placeAtWithAnimation(glm::vec3 destination, float duration);
     bool selectForMovement(float liftHeight = 0.3f, float duration = 0.2f);
     bool moveTo(glm::vec3 destination, float duration = 0.4f);
     bool cancelMovement();
