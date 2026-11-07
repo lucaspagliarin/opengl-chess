@@ -19,9 +19,10 @@
 #include <Texture.h>
 #include <Board.h>
 #include <iostream>
-//globais
-float globalXOffset=0.0f;
-float globalYOffset=0.0f;
+
+// Globais
+float globalXOffset = 0.0f;
+float globalYOffset = 0.0f;
 bool mouseAtivo = false;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -47,11 +48,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     globalXOffset = xoffset * sensitivity;
     globalYOffset = yoffset * sensitivity;
 }
+
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         std::cout << "Botão esquerdo clicado!" << std::endl;
 
-        // Aqui dentro você pode pegar a posição atual do cursor na tela
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
         std::cout << "X: " << xpos << " | Y: " << ypos << std::endl;
@@ -72,9 +73,7 @@ int main() {
 
     // Carrega texturas
     Texture tex1("wood.jpg");
-
     shader.setInt("texture1", 0);
-
 
     Group pecas(
         glm::vec3(0.0f),
@@ -84,295 +83,116 @@ int main() {
     );
 
     pecas.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    pecas.rotation = glm::vec3(0.0f, 1.0f,0.0f);
+    pecas.rotation = glm::vec3(0.0f, 1.0f, 0.0f);
     pecas.angle = 0.0f;
     pecas.scale = glm::vec3(1.0f);
 
-    // Cores das equipes
-    glm::vec4 whiteColor(0.9f, 0.9f, 0.9f, 1.0f);
-    glm::vec4 blackColor(0.16f, 0.16f, 0.16f, 1.0f);
+    // Instancia o tabuleiro (as peças já são criadas e gerenciadas dentro dele)
+    Board tabuleiro(glm::vec3(0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    tabuleiro.setupInitialPieces();
 
-    std::vector<Object*> whitePieces;
-    std::vector<Object*> blackPieces;
-
-    Pawn* wPawns[8];
-    for(int i = 0; i < 8; i++) {
-        wPawns[i] = new Pawn(glm::vec3(0.0f), whiteColor);
-    }
-
-    Bishop wbispo1(
-        glm::vec3(0.0f),
-        whiteColor
-    );
-    Bishop wbispo2(
-        glm::vec3(0.0f),
-        whiteColor
-    );
-
-    Rook wtorre1(
-        glm::vec3(0.0f),
-        whiteColor
-    );
-    Rook wtorre2(
-        glm::vec3(0.0f),
-        whiteColor
-    );
-
-    Queen wqueen(
-        glm::vec3(0.0f),
-        whiteColor
-    );
-
-    King wking(
-        glm::vec3(0.0f),
-        whiteColor
-    );
-
-    Knight wknight1(
-        glm::vec3(0.0f),
-        whiteColor
-    );
-    wknight1.angle = 180.0f;
-    Knight wknight2(
-        glm::vec3(0.0f),
-        whiteColor
-    );
-    wknight2.angle = 180.0f;
-
-    whitePieces.push_back(&wtorre1);
-    whitePieces.push_back(&wknight1);
-    whitePieces.push_back(&wbispo1);
-    whitePieces.push_back(&wqueen);
-    whitePieces.push_back(&wking);
-    whitePieces.push_back(&wbispo2);
-    whitePieces.push_back(&wknight2);
-    whitePieces.push_back(&wtorre2);
-    for(int i=0;i<8;i++){
-        whitePieces.push_back(wPawns[i]);
-    }
-
-Pawn* bPawns[8];
-    for(int i = 0; i < 8; i++) {
-        bPawns[i] = new Pawn(glm::vec3(0.0f), blackColor);
-    }
-
-    Bishop bbispo1(
-        glm::vec3(0.0f),
-        blackColor
-    );
-    Bishop bbispo2(
-        glm::vec3(0.0f),
-        blackColor
-    );
-
-    Rook btorre1(
-        glm::vec3(0.0f),
-        blackColor
-    );
-    Rook btorre2(
-        glm::vec3(0.0f),
-        blackColor
-    );
-
-    Queen bqueen(
-        glm::vec3(0.0f),
-        blackColor
-    );
-
-    King bking(
-        glm::vec3(0.0f),
-        blackColor
-    );
-
-    Knight bknight1(
-        glm::vec3(0.0f),
-        blackColor
-    );
-    Knight bknight2(
-        glm::vec3(0.0f),
-        blackColor
-    );
-
-    blackPieces.push_back(&btorre1);
-    blackPieces.push_back(&bknight1);
-    blackPieces.push_back(&bbispo1);
-    blackPieces.push_back(&bqueen);
-    blackPieces.push_back(&bking);
-    blackPieces.push_back(&bbispo2);
-    blackPieces.push_back(&bknight2);
-    blackPieces.push_back(&btorre2);
-    for(int i=0;i<8;i++){
-        blackPieces.push_back(bPawns[i]);
-    }
-
-    Board tabuleiro(glm::vec3(0.0f),glm::vec4(1.0f,0.0f,0.0f,1.0f));
-
-    tabuleiro.setupInitialPieces(whitePieces,blackPieces);
     // Ativa depth test
     glEnable(GL_DEPTH_TEST);
 
+    glm::vec3 cameraPos = glm::vec3(0.0f, 7.0f, 12.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::mat4 view;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 7.0f, 12.0f);
-glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::mat4 view;
+    // Velocidade de movimento
+    float speedFP = 4.0f;          // WASD primeira pessoa
+    float cameraSpeed = 15.0f;     // Câmera geral
+    float t = 0.0f;                // Fator da curva de transição
+    float transitionDuration = 2.0f; // Duração em segundos
+    bool emPrimeiraPessoa = false;
+    bool estaTransicionando = false;
+    bool pKeyPressionadaUltimoFrame = false;
+    bool mKeyPressionadaUltimoFrame = false;
+    bool iKeyPressionadaUltimoFrame = false;
+    Object* obj_Selected = nullptr;
 
+    glm::vec3 cameraPosInicial = glm::vec3(0.0f);
+    glm::vec3 cameraPosDestino = glm::vec3(0.0f);
+    glm::vec3 cameraTargetInicial = glm::vec3(0.0f);
 
-// Velocidade de movimento da câmera
-float speedFP = 4.0f ; // wasd primeira pessoa
-float cameraSpeed = 15.0f; //camera 3 pessoa
-float t = 0.0f;//fator curva
-float transitionDuration = 1.5f; // transição em seg
-bool emPrimeiraPessoa = false;
-bool estaTransicionando = false;
-bool pKeyPressionadaUltimoFrame = false;
-bool mKeyPressionadaUltimoFrame = false;
-bool iKeyPressionadaUltimoFrame = false;
-Object* obj_Selected=nullptr;
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
 
-
-glm::vec3 cameraPosInicial = glm::vec3(0.0f);
-glm::vec3 cameraPosDestino = glm::vec3(0.0f);
-glm::vec3 cameraTargetInicial= glm::vec3(0.0f);
-
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
     // Loop principal
     while (!glfwWindowShouldClose(app.getWindow())) {
-        // Processa input
+        // Processa input para fechar
         if (glfwGetKey(app.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(app.getWindow(), true);
 
         // Limpa tela e depth buffer
         glClearColor(0.3f, 0.3f, 0.5f, 1.0f);
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();
 
         glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::rotate(model, (angle * (float) glfwGetTime()) / 20, glm::vec3(0.0f, 0.3f, 0.0f));
-        //model = glm::rotate(model, -60.0f, glm::vec3(0.0f, 0.3f, 0.0f));
-
         shader.setMat4("model", model);
 
-        // Configura view e projection
+        // Configura projection
         glm::mat4 projection = glm::perspective(glm::radians(45.0f),
                                                 800.0f / 600.0f,
                                                 0.1f, 100.0f);
 
-    bool mouseLeftPressed = (glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
-        static bool clickUltimoFrame = false;
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
-        if (mouseLeftPressed && !clickUltimoFrame) {
-            double mouseX, mouseY;
-            glfwGetCursorPos(app.getWindow(), &mouseX, &mouseY);
-
-            int larguraInt, alturaInt;
-            glfwGetWindowSize(app.getWindow(), &larguraInt, &alturaInt);
-
-        float larguraJanela = static_cast<float>(larguraInt);
-        float alturaJanela = static_cast<float>(alturaInt);
-
-        float x_ndc = 2.0f * static_cast<float>(mouseX) / larguraJanela - 1.0f;
-        float y_ndc = 1.0f - (2.0f * static_cast<float>(mouseY) / alturaJanela);
-        std::cout << "Mouse Pixels -> X: " << mouseX << " | Y: " << mouseY<< "  ||  NDC -> X_ndc: " << x_ndc << " | Y_ndc: " << y_ndc << std::endl;
-
-    glm::vec4 ray_clip_near = glm::vec4(x_ndc, y_ndc, -1.0f, 1.0f);
-    glm::vec4 ray_clip_far  = glm::vec4(x_ndc, y_ndc,  1.0f, 1.0f);
-
-    // 4. Inverte a matriz (Projection * View) para trazer para o Mundo
-    glm::mat4 invMatriz = glm::inverse(projection * view);
-
-    glm::vec4 ray_world_near = invMatriz * ray_clip_near;
-    glm::vec4 ray_world_far  = invMatriz * ray_clip_far;
-
-    // Normalização homogênea (divide pelo W)
-    if (ray_world_near.w != 0.0f) ray_world_near /= ray_world_near.w;
-    if (ray_world_far.w  != 0.0f) ray_world_far  /= ray_world_far.w;
-
-    glm::vec3 pNear = glm::vec3(ray_world_near);
-    glm::vec3 pFar  = glm::vec3(ray_world_far);
-
-    // 5. Acha a direção do raio e faz a intersecção com o plano Y = 0
-    glm::vec3 direcaoRaio = glm::normalize(pFar - pNear);
-
-    // Evita divisão por zero caso o raio esteja perfeitamente paralelo ao plano
-    if (std::abs(direcaoRaio.y) > 0.0001f) {
-        float t = -pNear.y / direcaoRaio.y;
-        glm::vec3 pontoNoTabuleiro = pNear + (direcaoRaio * t);
-
-        // 6. Traduz o X e Z do mundo para os índices da sua matriz de xadrez [i][j]
-        float startX = -3.5f;
-        float startZ = -3.5f;
-
-        int j = static_cast<int>(std::floor(pontoNoTabuleiro.x - startX + 0.5f)); // Coluna
-        int i = static_cast<int>(std::floor(pontoNoTabuleiro.z - startZ + 0.5f)); // Linha
-
-        if (i >= 0 && i < 8 && j >= 0 && j < 8) {
-            std::cout << "Casa clicada -> Linha (i): " << i << " | Coluna (j): " << j << std::endl;
-        } else {
-            std::cout << "Clicou fora do tabuleiro!" << std::endl;
+        // Input da tecla 'I' para reiniciar as peças do tabuleiro
+        bool iKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_I) == GLFW_PRESS);
+        if (iKeyTriggered && !iKeyPressionadaUltimoFrame) {
+            tabuleiro.setupInitialPieces();
         }
-       }
+        iKeyPressionadaUltimoFrame = iKeyTriggered;
+
+        // Input da tecla 'P' para alternar o modo de câmera e iniciar a transição
+        bool pKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_P) == GLFW_PRESS);
+        if (pKeyTriggered && !pKeyPressionadaUltimoFrame && !estaTransicionando) {
+            emPrimeiraPessoa = !emPrimeiraPessoa;
+            estaTransicionando = true;
+            t = 0.0f; // Reseta o tempo da curva
+
+            if (emPrimeiraPessoa) {
+                cameraPosInicial = cameraPos;
+                cameraPosDestino = glm::vec3(-5.0f, 0.8f, 0.0f);
+                cameraTargetInicial = cameraTarget;
+            } else {
+                cameraPosInicial = cameraPos;
+                cameraPosDestino = glm::vec3(0.0f, 7.0f, 12.0f);
+                cameraTargetInicial = cameraTarget;
+            }
+
+            if (mouseAtivo) {
+                mouseAtivo = false;
+                glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
         }
-        clickUltimoFrame=mouseLeftPressed;
+        pKeyPressionadaUltimoFrame = pKeyTriggered;
 
-    float currentFrame = glfwGetTime();
-
-    bool iKeyTriggered = (glfwGetKey(app.getWindow(),GLFW_KEY_I)== GLFW_PRESS);
-    if (iKeyTriggered && !iKeyPressionadaUltimoFrame && !estaTransicionando){
-    tabuleiro.setupInitialPieces(whitePieces,blackPieces);
-    }
-    iKeyPressionadaUltimoFrame = iKeyTriggered;
-
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
-
-    bool pKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_P) == GLFW_PRESS);
-
-    if (pKeyTriggered && !pKeyPressionadaUltimoFrame && !estaTransicionando) {
-        emPrimeiraPessoa = !emPrimeiraPessoa;
-        estaTransicionando = true;
-
-        if (emPrimeiraPessoa) {
-            cameraPosInicial = cameraPos;
-            cameraPosDestino = glm::vec3(-5.0f, 0.8f, 0.0f);
-        }
-        else {
-            cameraPosInicial = glm::vec3(0.0f, 7.0f, 12.0f);
-            cameraPosDestino = cameraPos;
-            cameraTargetInicial = cameraTarget;
-        }
-        if (mouseAtivo) {
-            mouseAtivo = false;
-            glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        }
-    }
-
-    pKeyPressionadaUltimoFrame = pKeyTriggered;
-
-    if (estaTransicionando) {
-            t += deltaTime/transitionDuration;
+        // Atualização da transição suave da câmera
+        if (estaTransicionando) {
+            t += deltaTime / transitionDuration;
             if (t >= 1.0f) {
-                t = 0.0f;
+                t = 1.0f;
                 estaTransicionando = false;
             }
-    }
 
-    if (estaTransicionando) {
-        float fatorCurva = log(1.0f + t * (2.71828f - 1.0f));
+            float fatorCurva = glm::smoothstep(0.0f, 1.0f, t);
 
-        if (emPrimeiraPessoa) {
-        cameraPos = glm::mix(cameraPosInicial, cameraPosDestino, fatorCurva);
-    }
-    else {
-        cameraPos = glm::mix(cameraPosDestino, cameraPosInicial, fatorCurva);
-        cameraTarget = glm::mix(cameraTargetInicial, glm::vec3(0.0f, 0.0f, 0.0f), fatorCurva);
-    }
+            if (emPrimeiraPessoa) {
+                cameraPos = glm::mix(cameraPosInicial, cameraPosDestino, fatorCurva);
+            } else {
+                cameraPos = glm::mix(cameraPosInicial, cameraPosDestino, fatorCurva);
+                cameraTarget = glm::mix(cameraTargetInicial, glm::vec3(0.0f, 0.0f, 0.0f), fatorCurva);
+            }
+        }
 
-    }
-    bool mKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_M) == GLFW_PRESS);
+        // Input da tecla 'M' para ativar/desativar o mouse livre
+        bool mKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_M) == GLFW_PRESS);
         if (mKeyTriggered && !mKeyPressionadaUltimoFrame) {
             mouseAtivo = !mouseAtivo;
             if (mouseAtivo) {
@@ -383,13 +203,12 @@ float lastFrame = 0.0f;
         }
         mKeyPressionadaUltimoFrame = mKeyTriggered;
 
-        if(emPrimeiraPessoa && !estaTransicionando){
-
+        // Movimentação em Primeira Pessoa
+        if (emPrimeiraPessoa && !estaTransicionando) {
             glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
             glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
 
             if (mouseAtivo && (globalXOffset != 0.0f || globalYOffset != 0.0f)) {
-
                 glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), -globalXOffset, glm::vec3(0.0f, 1.0f, 0.0f));
                 direction = glm::vec3(rotX * glm::vec4(direction, 0.0f));
 
@@ -402,7 +221,6 @@ float lastFrame = 0.0f;
                 globalYOffset = 0.0f;
             }
 
-
             glm::vec3 moveDirXZ = glm::normalize(glm::vec3(direction.x, 0.0f, direction.z));
 
             if (glfwGetKey(app.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
@@ -414,38 +232,38 @@ float lastFrame = 0.0f;
             if (glfwGetKey(app.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
                 cameraPos += right * speedFP * deltaTime;
 
-
             cameraPos.y = 0.8f;
             cameraTarget = cameraPos + direction;
-
         }
-        else if (!estaTransicionando){
-        glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
-        glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
+        // Movimentação Geral / Órbita
+        else if (!estaTransicionando) {
+            glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
+            glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
 
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-            cameraPos -= right * cameraSpeed * deltaTime;
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-            cameraPos += right * cameraSpeed * deltaTime;
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-            cameraPos.y += cameraSpeed * deltaTime;
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-            cameraPos.y -= cameraSpeed * deltaTime;
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_UP) == GLFW_PRESS)
-            cameraPos += direction * cameraSpeed * deltaTime;
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
-            cameraPos -= direction * cameraSpeed * deltaTime;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+                cameraPos -= right * cameraSpeed * deltaTime;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+                cameraPos += right * cameraSpeed * deltaTime;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+                cameraPos.y += cameraSpeed * deltaTime;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+                cameraPos.y -= cameraSpeed * deltaTime;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_UP) == GLFW_PRESS)
+                cameraPos += direction * cameraSpeed * deltaTime;
+            if (glfwGetKey(app.getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
+                cameraPos -= direction * cameraSpeed * deltaTime;
         }
+
         view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
 
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
 
-        // Bind texturas
+        // Bind texturas e desenho dos objetos
         tex1.bind(0);
-        //tex2.bind(1);
         pecas.draw(shader, model);
-        tabuleiro.draw(shader,model);
+        tabuleiro.draw(shader, model);
+
         // Swap buffers e eventos
         glfwSwapBuffers(app.getWindow());
         glfwPollEvents();

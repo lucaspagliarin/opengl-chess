@@ -1,8 +1,11 @@
 #ifndef BOARD_H
 #define BOARD_H
+
+#include <vector>
 #include "Group.h"
 #include "Cube.h"
 #include "Texture.h"
+#include "Object.h"
 
 class Board : public Group
 {
@@ -14,15 +17,33 @@ class Board : public Group
               );
 
         virtual ~Board();
-    void setPieceAt(int row, int col, Object* piece);
-    void setupInitialPieces(std::vector<Object*> whitePieces, std::vector<Object*> blackPieces);
+
+        void setPieceAt(int row, int col, Object* piece);
+        void setupInitialPieces();
+
+        void setHoveredSquare(int row, int col);
+        void clearHover();
 
     protected:
 
     private:
-    Cube base;
-    Cube squares[8][8];
-    Texture* texture = nullptr;
+        Cube base;
+        Cube squares[8][8];
+        Texture* texture = nullptr;
+
+        glm::vec4 whiteColor = glm::vec4(0.9f, 0.9f, 0.9f, 1.0f);
+        glm::vec4 blackColor = glm::vec4(0.16f, 0.16f, 0.16f, 1.0f);
+
+        std::vector<Object*> whitePieces;
+        std::vector<Object*> blackPieces;
+
+        int hoveredRow = -1;
+        int hoveredCol = -1;
+
+        glm::vec4 lightColor = glm::vec4(0.9f, 0.85f, 0.70f, 1.0f);
+        glm::vec4 darkColor = glm::vec4(0.40f, 0.26f, 0.13f, 1.0f);
+
+        glm::vec4 hoverColor = glm::vec4(0.15f, 0.45f, 0.95f, 1.0f);
 };
 
 #endif // BOARD_H

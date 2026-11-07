@@ -6,6 +6,7 @@ class Moviments
 {
     public:
         Moviments();
+
         virtual ~Moviments();
 
     protected:
