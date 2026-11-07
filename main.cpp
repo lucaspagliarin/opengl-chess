@@ -217,9 +217,10 @@ glm::mat4 view;
 
 
 // Velocidade de movimento da câmera
-float cameraSpeed = 0.2f;
-float t = 0.0f;
-float velocidade = 0.02f;
+float speedFP = 4.0f ; // wasd primeira pessoa
+float cameraSpeed = 15.0f; //camera 3 pessoa
+float t = 0.0f;//fator curva
+float transitionDuration = 1.5f; // transição em seg
 bool emPrimeiraPessoa = false;
 bool estaTransicionando = false;
 bool pKeyPressionadaUltimoFrame = false;
@@ -231,6 +232,8 @@ glm::vec3 cameraPosInicial = glm::vec3(0.0f);
 glm::vec3 cameraPosDestino = glm::vec3(0.0f);
 glm::vec3 cameraTargetInicial= glm::vec3(0.0f);
 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
     // Loop principal
     while (!glfwWindowShouldClose(app.getWindow())) {
         // Processa input
@@ -311,7 +314,11 @@ glm::vec3 cameraTargetInicial= glm::vec3(0.0f);
         }
         clickUltimoFrame=mouseLeftPressed;
 
-        float deltaTime = 0.016f;
+    float currentFrame = glfwGetTime();
+
+    deltaTime = currentFrame - lastFrame;
+
+    lastFrame = currentFrame;
 
     bool pKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_P) == GLFW_PRESS);
 
@@ -341,14 +348,14 @@ glm::vec3 cameraTargetInicial= glm::vec3(0.0f);
 
     if (estaTransicionando) {
         if (emPrimeiraPessoa) {
-            t += velocidade * deltaTime;
+            t += deltaTime/transitionDuration;
             if (t >= 1.0f) {
                 t = 1.0f;
                 estaTransicionando = false;
             }
         }
         else {
-            t -= velocidade * deltaTime;
+            t -= deltaTime/transitionDuration;
             if (t <= 0.0f) {
                 t = 0.0f;
                 estaTransicionando = false;
@@ -396,17 +403,17 @@ glm::vec3 cameraTargetInicial= glm::vec3(0.0f);
                 globalYOffset = 0.0f;
             }
 
-            float speedFP = 0.3f * deltaTime;
+
             glm::vec3 moveDirXZ = glm::normalize(glm::vec3(direction.x, 0.0f, direction.z));
 
             if (glfwGetKey(app.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-                cameraPos += moveDirXZ * speedFP;
+                cameraPos += moveDirXZ * speedFP * deltaTime;
             if (glfwGetKey(app.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-                cameraPos -= moveDirXZ * speedFP;
+                cameraPos -= moveDirXZ * speedFP * deltaTime;
             if (glfwGetKey(app.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-                cameraPos -= right * speedFP;
+                cameraPos -= right * speedFP * deltaTime;
             if (glfwGetKey(app.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-                cameraPos += right * speedFP;
+                cameraPos += right * speedFP * deltaTime;
 
 
             cameraPos.y = 0.8f;
