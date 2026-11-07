@@ -57,6 +57,7 @@
 		<Unit filename="include/King.h" />
 		<Unit filename="include/Knight.h" />
 		<Unit filename="include/Mesh.h" />
+		<Unit filename="include/Moviments.h" />
 		<Unit filename="include/Object.h" />
 		<Unit filename="include/Pawn.h" />
 		<Unit filename="include/Prisma.h" />
@@ -77,6 +78,7 @@
 		<Unit filename="src/King.cpp" />
 		<Unit filename="src/Knight.cpp" />
 		<Unit filename="src/Mesh.cpp" />
+		<Unit filename="src/Moviments.cpp" />
 		<Unit filename="src/Object.cpp" />
 		<Unit filename="src/Pawn.cpp" />
 		<Unit filename="src/Prisma.cpp" />
