@@ -257,7 +257,8 @@ int main() {
         glm::vec3(0.0f),
         whiteColor
     );
-
+    wknight1.angle = 180;
+    wknight2.angle = 180;
     whitePieces.push_back(&wtorre1);
     whitePieces.push_back(&wknight1);
     whitePieces.push_back(&wbispo1);
