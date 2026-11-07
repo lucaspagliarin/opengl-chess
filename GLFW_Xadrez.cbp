@@ -48,6 +48,7 @@
 		</Compiler>
 		<Unit filename="include/Application.h" />
 		<Unit filename="include/Bishop.h" />
+		<Unit filename="include/Board.h" />
 		<Unit filename="include/Cube.h" />
 		<Unit filename="include/Cylinder.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -69,6 +70,7 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Application.cpp" />
 		<Unit filename="src/Bishop.cpp" />
+		<Unit filename="src/Board.cpp" />
 		<Unit filename="src/Cube.cpp" />
 		<Unit filename="src/Cylinder.cpp" />
 		<Unit filename="src/Group.cpp" />

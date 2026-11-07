@@ -1,144 +1,9 @@
 # depslib dependency file v1.0
-1762216767 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Application.cpp
+1793643718 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\application.cpp
 	"Application.h"
 	<iostream>
 
-1762216629 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Application.h
-	<GL/glew.h>
-	<GLFW/glfw3.h>
-	<string>
-
-1757014824 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Mesh.cpp
-	"Mesh.h"
-
-1757014811 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Mesh.h
-	<GL/glew.h>
-
-1792008534 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/main.cpp
-	<GL/glew.h>
-	<GLFW/glfw3.h>
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-	<glm/gtc/type_ptr.hpp>
-	<Shader.h>
-	<Application.h>
-	<Cube.h>
-	<Banrisul.h>
-	<Texture.h>
-	<iostream>
-
-1603120690 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Shader.h
-	<GL/glew.h>
-	<glm/glm.hpp>
-	<string>
-	<fstream>
-	<sstream>
-	<iostream>
-
-1603045934 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/stb_image.cpp
-	"stb_image.h"
-
-1603045863 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/stb_image.h
-	"stb_image.h"
-	<stdio.h>
-	<stdlib.h>
-	<stdarg.h>
-	<stddef.h>
-	<stdlib.h>
-	<string.h>
-	<limits.h>
-	<math.h>
-	<stdio.h>
-	<assert.h>
-	<stdint.h>
-	<emmintrin.h>
-	<intrin.h>
-	<arm_neon.h>
-
-1757015399 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Texture.cpp
-	"Texture.h"
-	<stb_image.h>
-	<iostream>
-
-1757015408 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Texture.h
-	<GL/glew.h>
-	<string>
-
-1760993895 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Cube.cpp
-	"Cube.h"
-
-1760978718 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Cube.h
-	"Shader.h"
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-	<Object.h>
-
-1757526646 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/TieFighter.cpp
-	"TieFighter.h"
-
-1757526679 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/TieFighter.h
-	"Cube.h"
-	"Sphere.h"
-	<vector>
-
-1757447880 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Cylinder.h
-	<glm/glm.hpp>
-	"Shader.h"
-	<vector>
-
-1757455831 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Cylinder.cpp
-	"Cylinder.h"
-	<glm/gtc/matrix_transform.hpp>
-	<cmath>
-
-1757526385 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Sphere.h
-	<glm/glm.hpp>
-	"Shader.h"
-	"Object.h"
-	<vector>
-
-1757455958 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Sphere.cpp
-	"Sphere.h"
-	<glm/gtc/matrix_transform.hpp>
-	<cmath>
-
-1760980214 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Object.h
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-	<vector>
-	"Shader.h"
-
-1760979846 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Banrisul.h
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-	"Object.h"
-	"Shader.h"
-	<vector>
-	<memory>
-
-1792008642 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Banrisul.cpp
-	"Banrisul.h"
-	"Cube.h"
-
-1760993472 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Object.cpp
-	"Object.h"
-	<glm/gtc/matrix_transform.hpp>
-	<glm/gtc/type_ptr.hpp>
-
-1762216816 source:/mnt/1Tera/LinguagemC/GLFW_Cubo_OO/src/Prisma.cpp
-	"Prisma.h"
-
-1761179410 /mnt/1Tera/LinguagemC/GLFW_Cubo_OO/include/Prisma.h
-	"Shader.h"
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-	<Object.h>
-
-1793643718 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\application.cpp
-	"Application.h"
-	<iostream>
-
-1793643718 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\application.h
+1793643718 c:\www\cg\opengl (3d)\glfw_xadrez\include\application.h
 	<GL/glew.h>
 	<GLFW/glfw3.h>
 	<string>
@@ -180,34 +45,23 @@
 	<GL/gl.h>
 	<GL/glext.h>
 
-1793643718 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\mesh.cpp
-	"Mesh.h"
+1793662134 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\bishop.cpp
+	"Bishop.h"
 
-1793643718 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\mesh.h
-	<GL/glew.h>
+1793662080 c:\www\cg\opengl (3d)\glfw_xadrez\include\bishop.h
+	"Group.h"
+	"Cylinder.h"
+	"Sphere.h"
 
-1793665372 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\main.cpp
-	<GL/glew.h>
-	<GLFW/glfw3.h>
+1793655364 c:\www\cg\opengl (3d)\glfw_xadrez\include\group.h
+	"Object.h"
+	<vector>
+
+1793643718 c:\www\cg\opengl (3d)\glfw_xadrez\include\object.h
 	<glm/glm.hpp>
 	<glm/gtc/matrix_transform.hpp>
-	<glm/gtc/type_ptr.hpp>
-	<Shader.h>
-	<Application.h>
-	<Cube.h>
-	<Cylinder.h>
-	<Pyramid.h>
-	<Sphere.h>
-	<Group.h>
-	<Pawn.h>
-	<Rook.h>
-	<Queen.h>
-	<King.h>
-	<Knight.h>
-	<Bishop.h>
-	<Banrisul.h>
-	<Texture.h>
-	<iostream>
+	<vector>
+	"Shader.h"
 
 1793645638 c:\glm\glm\glm.hpp
 	"detail/_fixes.hpp"
@@ -918,6 +772,93 @@
 	"../trigonometric.hpp"
 	"../matrix.hpp"
 
+1793643718 c:\www\cg\opengl (3d)\glfw_xadrez\include\shader.h
+	<GL/glew.h>
+	<glm/glm.hpp>
+	<string>
+	<fstream>
+	<sstream>
+	<iostream>
+
+1793648268 c:\www\cg\opengl (3d)\glfw_xadrez\include\cylinder.h
+	"Shader.h"
+	"Object.h"
+	<glm/glm.hpp>
+	<glm/gtc/matrix_transform.hpp>
+
+1793650401 c:\www\cg\opengl (3d)\glfw_xadrez\include\sphere.h
+	"Shader.h"
+	"Object.h"
+	<glm/glm.hpp>
+	<glm/gtc/matrix_transform.hpp>
+
+1794058845 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\board.cpp
+	"Board.h"
+
+1794058763 c:\www\cg\opengl (3d)\glfw_xadrez\include\board.h
+	"Group.h"
+	"Cube.h"
+	"Texture.h"
+
+1794058229 c:\www\cg\opengl (3d)\glfw_xadrez\include\cube.h
+	"Object.h"
+
+1793643718 c:\www\cg\opengl (3d)\glfw_xadrez\include\texture.h
+	<GL/glew.h>
+	<string>
+
+1794058245 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\cube.cpp
+	"Cube.h"
+
+1793648321 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\cylinder.cpp
+	"Cylinder.h"
+	<GL/glew.h>
+	<cmath>
+	<vector>
+	<algorithm>
+
+1793655437 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\group.cpp
+	"Group.h"
+
+1793665974 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\king.cpp
+	"King.h"
+
+1793665775 c:\www\cg\opengl (3d)\glfw_xadrez\include\king.h
+	"Group.h"
+	"Cylinder.h"
+	"Sphere.h"
+	"Cube.h"
+
+1793719900 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\knight.cpp
+	"Knight.h"
+
+1793719676 c:\www\cg\opengl (3d)\glfw_xadrez\include\knight.h
+	"Group.h"
+	"Cylinder.h"
+	"Pyramid.h"
+	"Prisma.h"
+	"Cube.h"
+
+1793658239 c:\www\cg\opengl (3d)\glfw_xadrez\include\pyramid.h
+	"Shader.h"
+	"Object.h"
+	<glm/glm.hpp>
+	<glm/gtc/matrix_transform.hpp>
+
+1793658126 c:\www\cg\opengl (3d)\glfw_xadrez\include\prisma.h
+	"Object.h"
+
+1793643718 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\mesh.cpp
+	"Mesh.h"
+
+1793643718 c:\www\cg\opengl (3d)\glfw_xadrez\include\mesh.h
+	<GL/glew.h>
+
+1793643718 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\object.cpp
+	"Object.h"
+	<glm/gtc/matrix_transform.hpp>
+	<glm/gtc/type_ptr.hpp>
+
 1793645640 c:\glm\glm\gtc\type_ptr.hpp
 	"../gtc/quaternion.hpp"
 	"../gtc/vec1.hpp"
@@ -1113,54 +1054,54 @@
 1793645640 c:\glm\glm\gtc\type_ptr.inl
 	<cstring>
 
-1793643718 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\shader.h
-	<GL/glew.h>
-	<glm/glm.hpp>
-	<string>
-	<fstream>
-	<sstream>
-	<iostream>
+1793662450 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\pawn.cpp
+	"Pawn.h"
 
-1793660471 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\cube.h
-	"Object.h"
+1793662317 c:\www\cg\opengl (3d)\glfw_xadrez\include\pawn.h
+	"Group.h"
+	"Cylinder.h"
+	"Sphere.h"
 
-1793643718 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\object.h
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-	<vector>
-	"Shader.h"
-
-1793643718 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\banrisul.h
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-	"Object.h"
-	"Shader.h"
-	<vector>
-	<memory>
-
-1793643718 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\texture.h
-	<GL/glew.h>
-	<string>
-
-1793643718 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\banrisul.cpp
-	"Banrisul.h"
-	"Cube.h"
-
-1793643718 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\object.cpp
-	"Object.h"
-	<glm/gtc/matrix_transform.hpp>
-	<glm/gtc/type_ptr.hpp>
-
-1793718518 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\prisma.cpp
+1793718518 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\prisma.cpp
 	"Prisma.h"
 
-1793658126 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\prisma.h
-	"Object.h"
+1793658226 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\pyramid.cpp
+	"Pyramid.h"
+	<GL/glew.h>
+	<vector>
+	<algorithm>
 
-1793643718 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\stb_image.cpp
+1793665023 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\queen.cpp
+	"Queen.h"
+	"Cylinder.h"
+	"Sphere.h"
+
+1793664790 c:\www\cg\opengl (3d)\glfw_xadrez\include\queen.h
+	"Group.h"
+	"Cylinder.h"
+	"Sphere.h"
+
+1793662283 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\rook.cpp
+	"Rook.h"
+	<cmath>
+
+1793660577 c:\www\cg\opengl (3d)\glfw_xadrez\include\rook.h
+	"Group.h"
+	"Cylinder.h"
+	"Cube.h"
+	<vector>
+
+1793650434 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\sphere.cpp
+	"Sphere.h"
+	<GL/glew.h>
+	<vector>
+	<cmath>
+	<algorithm>
+
+1793643718 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\stb_image.cpp
 	"stb_image.h"
 
-1793643718 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\stb_image.h
+1793643718 c:\www\cg\opengl (3d)\glfw_xadrez\include\stb_image.h
 	"stb_image.h"
 	<stdio.h>
 	<stdlib.h>
@@ -1177,111 +1118,31 @@
 	<intrin.h>
 	<arm_neon.h>
 
-1793643718 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\texture.cpp
+1793643718 source:c:\www\cg\opengl (3d)\glfw_xadrez\src\texture.cpp
 	"Texture.h"
 	<stb_image.h>
 	<iostream>
 
-1793660506 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\cube.cpp
-	"Cube.h"
-
-1793648321 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\cylinder.cpp
-	"Cylinder.h"
+1794059087 source:c:\www\cg\opengl (3d)\glfw_xadrez\main.cpp
 	<GL/glew.h>
-	<cmath>
-	<vector>
-	<algorithm>
-
-1793648268 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\cylinder.h
-	"Shader.h"
-	"Object.h"
+	<GLFW/glfw3.h>
 	<glm/glm.hpp>
 	<glm/gtc/matrix_transform.hpp>
-
-1793658226 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\pyramid.cpp
-	"Pyramid.h"
-	<GL/glew.h>
-	<vector>
-	<algorithm>
-
-1793658239 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\pyramid.h
-	"Shader.h"
-	"Object.h"
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-
-1793650434 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\sphere.cpp
-	"Sphere.h"
-	<GL/glew.h>
-	<vector>
-	<cmath>
-	<algorithm>
-
-1793650401 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\sphere.h
-	"Shader.h"
-	"Object.h"
-	<glm/glm.hpp>
-	<glm/gtc/matrix_transform.hpp>
-
-1793655437 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\group.cpp
-	"Group.h"
-
-1793655364 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\group.h
-	"Object.h"
-	<vector>
-
-1793662450 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\pawn.cpp
-	"Pawn.h"
-
-1793662317 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\pawn.h
-	"Group.h"
-	"Cylinder.h"
-	"Sphere.h"
-
-1793662283 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\rook.cpp
-	"Rook.h"
-	<cmath>
-
-1793660577 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\rook.h
-	"Group.h"
-	"Cylinder.h"
-	"Cube.h"
-	<vector>
-
-1793662134 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\bishop.cpp
-	"Bishop.h"
-
-1793662080 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\bishop.h
-	"Group.h"
-	"Cylinder.h"
-	"Sphere.h"
-
-1793665023 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\queen.cpp
-	"Queen.h"
-	"Cylinder.h"
-	"Sphere.h"
-
-1793664790 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\queen.h
-	"Group.h"
-	"Cylinder.h"
-	"Sphere.h"
-
-1793665974 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\king.cpp
-	"King.h"
-
-1793665775 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\king.h
-	"Group.h"
-	"Cylinder.h"
-	"Sphere.h"
-	"Cube.h"
-
-1793719900 source:c:\www\cg\opengl (3d)\glfw_cubo_oo\src\knight.cpp
-	"Knight.h"
-
-1793719676 c:\www\cg\opengl (3d)\glfw_cubo_oo\include\knight.h
-	"Group.h"
-	"Cylinder.h"
-	"Pyramid.h"
-	"Prisma.h"
-	"Cube.h"
+	<glm/gtc/type_ptr.hpp>
+	<Shader.h>
+	<Application.h>
+	<Cube.h>
+	<Cylinder.h>
+	<Pyramid.h>
+	<Sphere.h>
+	<Group.h>
+	<Pawn.h>
+	<Rook.h>
+	<Queen.h>
+	<King.h>
+	<Knight.h>
+	<Bishop.h>
+	<Texture.h>
+	<Board.h>
+	<iostream>
 
