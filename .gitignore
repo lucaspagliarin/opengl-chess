@@ -1,0 +1,39 @@
+# --- Code::Blocks / IDEs ---
+.depend/
+*.depend
+*.layout
+*.cbp.user
+
+# --- Pastas de Compilação (Binários e Objetos) ---
+bin/
+obj/
+Debug/
+Release/
+
+# --- Arquivos compilados do Windows ---
+*.exe
+*.dll
+*.lib
+*.obj
+*.exp
+
+# --- Arquivos compilados do Linux/Mac ---
+*.o
+*.a
+*.so
+
+# --- Arquivos do Sistema Operacional ---
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
