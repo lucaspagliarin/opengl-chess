@@ -132,10 +132,12 @@ int main() {
         glm::vec3(0.0f),
         whiteColor
     );
+    wknight1.angle = 180.0f;
     Knight wknight2(
         glm::vec3(0.0f),
         whiteColor
     );
+    wknight2.angle = 180.0f;
 
     whitePieces.push_back(&wtorre1);
     whitePieces.push_back(&wknight1);
@@ -225,6 +227,7 @@ bool emPrimeiraPessoa = false;
 bool estaTransicionando = false;
 bool pKeyPressionadaUltimoFrame = false;
 bool mKeyPressionadaUltimoFrame = false;
+bool iKeyPressionadaUltimoFrame = false;
 Object* obj_Selected=nullptr;
 
 
@@ -257,6 +260,7 @@ float lastFrame = 0.0f;
         glm::mat4 projection = glm::perspective(glm::radians(45.0f),
                                                 800.0f / 600.0f,
                                                 0.1f, 100.0f);
+
     bool mouseLeftPressed = (glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
         static bool clickUltimoFrame = false;
 
@@ -316,8 +320,13 @@ float lastFrame = 0.0f;
 
     float currentFrame = glfwGetTime();
 
-    deltaTime = currentFrame - lastFrame;
+    bool iKeyTriggered = (glfwGetKey(app.getWindow(),GLFW_KEY_I)== GLFW_PRESS);
+    if (iKeyTriggered && !iKeyPressionadaUltimoFrame && !estaTransicionando){
+    tabuleiro.setupInitialPieces(whitePieces,blackPieces);
+    }
+    iKeyPressionadaUltimoFrame = iKeyTriggered;
 
+    deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
     bool pKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_P) == GLFW_PRESS);
@@ -329,15 +338,12 @@ float lastFrame = 0.0f;
         if (emPrimeiraPessoa) {
             cameraPosInicial = cameraPos;
             cameraPosDestino = glm::vec3(-5.0f, 0.8f, 0.0f);
-            t=0.0f;
         }
         else {
             cameraPosInicial = glm::vec3(0.0f, 7.0f, 12.0f);
             cameraPosDestino = cameraPos;
             cameraTargetInicial = cameraTarget;
-            t=1.0f;
         }
-
         if (mouseAtivo) {
             mouseAtivo = false;
             glfwSetInputMode(app.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -347,30 +353,23 @@ float lastFrame = 0.0f;
     pKeyPressionadaUltimoFrame = pKeyTriggered;
 
     if (estaTransicionando) {
-        if (emPrimeiraPessoa) {
             t += deltaTime/transitionDuration;
             if (t >= 1.0f) {
-                t = 1.0f;
-                estaTransicionando = false;
-            }
-        }
-        else {
-            t -= deltaTime/transitionDuration;
-            if (t <= 0.0f) {
                 t = 0.0f;
                 estaTransicionando = false;
             }
-        }
     }
 
     if (estaTransicionando) {
         float fatorCurva = log(1.0f + t * (2.71828f - 1.0f));
 
+        if (emPrimeiraPessoa) {
         cameraPos = glm::mix(cameraPosInicial, cameraPosDestino, fatorCurva);
-        if(!emPrimeiraPessoa){
-            glm::vec3 targetFinal = glm::vec3(0.0f, 0.0f, 0.0f);
-            cameraTarget = glm::mix(targetFinal, cameraTargetInicial, fatorCurva);
-        }
+    }
+    else {
+        cameraPos = glm::mix(cameraPosDestino, cameraPosInicial, fatorCurva);
+        cameraTarget = glm::mix(cameraTargetInicial, glm::vec3(0.0f, 0.0f, 0.0f), fatorCurva);
+    }
 
     }
     bool mKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_M) == GLFW_PRESS);
@@ -438,6 +437,7 @@ float lastFrame = 0.0f;
             cameraPos -= direction * cameraSpeed * deltaTime;
         }
         view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
 

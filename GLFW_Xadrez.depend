@@ -1106,7 +1106,7 @@
 	<intrin.h>
 	<arm_neon.h>
 
-1794055295 source:c:\users\jonatan\prog\codeblocks\opengl-chess\main.cpp
+1794055640 source:c:\users\jonatan\prog\codeblocks\opengl-chess\main.cpp
 	<GL/glew.h>
 	<GLFW/glfw3.h>
 	<glm/glm.hpp>
@@ -1145,4 +1145,9 @@
 	"Group.h"
 	"Cube.h"
 	"Texture.h"
+
+1794059670 source:c:\users\jonatan\prog\codeblocks\opengl-chess\src\moviments.cpp
+	"Moviments.h"
+
+1794059745 c:\users\jonatan\prog\codeblocks\opengl-chess\include\moviments.h
 
