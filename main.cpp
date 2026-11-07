@@ -72,9 +72,6 @@ std::pair<int, int> getBoardCoords(double mouseX, double mouseY, int larguraInt,
     float x_ndc = 2.0f * static_cast<float>(mouseX) / larguraJanela - 1.0f;
     float y_ndc = 1.0f - (2.0f * static_cast<float>(mouseY) / alturaJanela);
 
-    // std::cout << "Mouse Pixels -> X: " << mouseX << " | Y: " << mouseY<< "  ||  NDC -> X_ndc: " << x_ndc << " | Y_ndc: " << y_ndc << std::endl;
-
-
     glm::vec4 ray_clip_near = glm::vec4(x_ndc, y_ndc, -1.0f, 1.0f);
     glm::vec4 ray_clip_far  = glm::vec4(x_ndc, y_ndc,  1.0f, 1.0f);
 
@@ -349,7 +346,19 @@ bool emPrimeiraPessoa = false;
 bool estaTransicionando = false;
 bool pKeyPressionadaUltimoFrame = false;
 bool mKeyPressionadaUltimoFrame = false;
+
 Object* obj_Selected=nullptr;
+int selectedRow = -1;
+int selectedCol = -1;
+
+int destinationRow = -1;
+int destinationCol = -1;
+
+bool moveInProgress = false;
+bool moveCancelled = false;
+bool cancelInProgress = false;
+
+bool escPressionadaUltimoFrame = false;
 
 
 glm::vec3 cameraPosInicial = glm::vec3(0.0f);
@@ -360,9 +369,10 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
     // Loop principal
     while (!glfwWindowShouldClose(app.getWindow())) {
+
         // Processa input
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(app.getWindow(), true);
+//        if (glfwGetKey(app.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+//           glfwSetWindowShouldClose(app.getWindow(), true);
 
         // Limpa tela e depth buffer
         glClearColor(0.3f, 0.3f, 0.5f, 1.0f);
@@ -378,9 +388,15 @@ float lastFrame = 0.0f;
         shader.setMat4("model", model);
 
         // Configura view e projection
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-                                                800.0f / 600.0f,
-                                                0.1f, 100.0f);
+        int larguraInt, alturaInt;
+        glfwGetWindowSize(app.getWindow(), &larguraInt, &alturaInt);
+
+        glm::mat4 projection = glm::perspective(
+            glm::radians(45.0f),
+            (float)larguraInt / (float)alturaInt,
+            0.1f,
+            100.0f
+        );
 
 
     float currentFrame = glfwGetTime();
@@ -558,6 +574,183 @@ float lastFrame = 0.0f;
 
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
+
+
+        // =====================================================
+        // CONTROLE DE SELEÇÃO E MOVIMENTAÇÃO DAS PEÇAS
+        // =====================================================
+
+        // ESC cancela a seleção ou o movimento.
+        // Sem peça selecionada, não executa nenhuma ação.
+        bool escPressionada =
+            glfwGetKey(app.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
+
+        if (escPressionada && !escPressionadaUltimoFrame) {
+
+            if (obj_Selected != nullptr) {
+
+                cancelInProgress = true;
+
+                if (moveInProgress) {
+                    moveCancelled = true;
+                }
+
+                obj_Selected->cancelMovement();
+            }
+        }
+
+        escPressionadaUltimoFrame = escPressionada;
+
+
+        // Atualiza a animação da peça selecionada.
+        if (obj_Selected != nullptr) {
+
+            obj_Selected->updateMovement(deltaTime);
+
+            // A animação terminou.
+            if (!obj_Selected->isAnimating() &&
+                !obj_Selected->isSelected()) {
+
+                // Se havia um movimento, atualiza a matriz.
+                if (moveInProgress && !moveCancelled) {
+
+                    tabuleiro.movePieceInGrid(
+                        selectedRow,
+                        selectedCol,
+                        destinationRow,
+                        destinationCol
+                    );
+                }
+
+                // Limpa o estado da seleção.
+                if (moveInProgress || cancelInProgress) {
+
+                    obj_Selected = nullptr;
+
+                    selectedRow = -1;
+                    selectedCol = -1;
+
+                    destinationRow = -1;
+                    destinationCol = -1;
+
+                    moveInProgress = false;
+                    moveCancelled = false;
+                    cancelInProgress = false;
+
+                    tabuleiro.clearMoveHighlights();
+                }
+            }
+        }
+
+
+        // Detecta o clique do mouse.
+        mouseLeftPressed =
+            glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+
+        clickUltimoFrame = false;
+
+        if (mouseLeftPressed && !clickUltimoFrame) {
+
+            // Não aceita novos cliques enquanto a peça está animando
+            // ou retornando à posição original.
+            bool podeInteragir =
+                obj_Selected == nullptr ||
+                (!obj_Selected->isAnimating() &&
+                 !moveInProgress &&
+                 !cancelInProgress);
+
+            if (podeInteragir) {
+
+                double mouseX, mouseY;
+
+                if (mouseAtivo) {
+                    // Primeira pessoa: utiliza o centro da tela.
+                    mouseX = larguraInt / 2.0;
+                    mouseY = alturaInt / 2.0;
+                }
+                else {
+                    glfwGetCursorPos(app.getWindow(), &mouseX, &mouseY);
+                }
+
+                auto [i, j] = getBoardCoords(
+                    mouseX,
+                    mouseY,
+                    larguraInt,
+                    alturaInt,
+                    projection,
+                    view
+                );
+
+                // Só processa cliques dentro do tabuleiro.
+                if (i >= 0 && i < 8 && j >= 0 && j < 8) {
+
+                    // =============================================
+                    // NENHUMA PEÇA SELECIONADA
+                    // =============================================
+
+                    if (obj_Selected == nullptr) {
+
+                        Object* clickedPiece = tabuleiro.grid[i][j];
+
+                        // Só permite selecionar casas ocupadas.
+                        if (clickedPiece != nullptr) {
+
+                            if (clickedPiece->selectForMovement()) {
+
+                                obj_Selected = clickedPiece;
+
+                                selectedRow = i;
+                                selectedCol = j;
+
+                                tabuleiro.highlightOccupiedSquares();
+                                tabuleiro.setMovementMode(true);
+                            }
+                        }
+                    }
+
+                    // =============================================
+                    // JÁ EXISTE UMA PEÇA SELECIONADA
+                    // =============================================
+
+                    else {
+
+                        // Clicou novamente na casa original:
+                        // cancela a seleção.
+                        if (i == selectedRow && j == selectedCol) {
+
+                            cancelInProgress = true;
+
+                            obj_Selected->cancelMovement();
+                            tabuleiro.setMovementMode(false);
+                        }
+
+                        // Clicou em uma casa vazia:
+                        // inicia a movimentação.
+                        else if (tabuleiro.isSquareEmpty(i, j)) {
+
+                            destinationRow = i;
+                            destinationCol = j;
+
+                            glm::vec3 destination =
+                                tabuleiro.getSquarePosition(i, j);
+
+                            if (obj_Selected->moveTo(destination)) {
+
+                                moveInProgress = true;
+                                moveCancelled = false;
+                            }
+                            tabuleiro.setMovementMode(false);
+                        }
+
+                        // Casa ocupada: não faz nada.
+                    }
+                }
+            }
+        }
+
+        clickUltimoFrame = mouseLeftPressed;
+
+
 
         // Bind texturas
         tex1.bind(0);

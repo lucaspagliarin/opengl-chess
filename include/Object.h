@@ -18,6 +18,47 @@ public:
 
     virtual void draw(Shader& shader, glm::mat4 parentTransform);
     virtual ~Object() {}
+
+    void setMovementEnabled(bool enabled);
+
+    bool selectForMovement(float liftHeight = 0.3f, float duration = 0.2f);
+    bool moveTo(glm::vec3 destination, float duration = 0.4f);
+    bool cancelMovement();
+
+    void updateMovement(float deltaTime);
+
+    bool isAnimating() const;
+    bool isSelected() const;
+
+private:
+    enum class MovementState {
+        Idle,
+        Lifting,
+        Selected,
+        MovingHorizontal,
+        Lowering,
+        ReturningHorizontal,
+        ReturningVertical
+    };
+
+    bool movementEnabled = false;
+
+    MovementState movementState = MovementState::Idle;
+
+    glm::vec3 originalPosition;
+    glm::vec3 phaseStart;
+    glm::vec3 phaseTarget;
+    glm::vec3 destinationPosition;
+
+    float phaseElapsed = 0.0f;
+    float phaseDuration = 0.2f;
+    float liftHeight = 0.8f;
+
+    void startPhase(
+        glm::vec3 target,
+        MovementState nextState,
+        float duration
+    );
 };
 
 #endif

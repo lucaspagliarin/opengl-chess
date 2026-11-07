@@ -2,7 +2,14 @@
 
 Board::Board(glm::vec3 pos, glm::vec4 color)
     : Group(pos),
-      base(glm::vec3(0.0f, -0.15f, 0.0f), glm::vec3(0.0f), glm::vec3(9.0f, 0.3f, 9.0f), 0.0f, glm::vec4(0.40f, 0.20f, 0.06f, 1.0f), false)
+      base(
+          glm::vec3(0.0f, -0.15f, 0.0f),
+          glm::vec3(0.0f),
+          glm::vec3(9.0f, 0.3f, 9.0f),
+          0.0f,
+          glm::vec4(0.40f, 0.20f, 0.06f, 1.0f),
+          false
+      )
 {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -13,21 +20,29 @@ Board::Board(glm::vec3 pos, glm::vec4 color)
     addChild(&base);
 
     float tileSize = 1.0f;
-    float startX = -3.5f * tileSize;
-    float startZ = -3.5f * tileSize;
-
-    float tileY = 0.0f;
+    float startX = -3.5f;
+    float startZ = -3.5f;
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
+
             float x = startX + j * tileSize;
             float z = startZ + i * tileSize;
 
-            glm::vec4 tileColor = ((i + j) % 2 == 0) ? lightColor : darkColor;
+            glm::vec4 tileColor =
+                ((i + j) % 2 == 0) ? lightColor : darkColor;
 
-            squares[i][j] = Cube(glm::vec3(x, tileY, z), glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, tileColor, true);
+            squares[i][j] = Cube(
+                glm::vec3(x, 0.0f, z),
+                glm::vec3(0.0f),
+                glm::vec3(0.0f),
+                0.0f,
+                tileColor,
+                true
+            );
+
             squares[i][j].position = glm::vec3(x, 0.01f, z);
-            squares[i][j].scale = glm::vec3(tileSize, 0.02f, tileSize);
+            squares[i][j].scale = glm::vec3(1.0f, 0.02f, 1.0f);
 
             addChild(&squares[i][j]);
         }
@@ -36,17 +51,17 @@ Board::Board(glm::vec3 pos, glm::vec4 color)
 
 Board::~Board()
 {
-    //dtor
 }
 
-void Board::setPieceAt(int row, int col, Object* piece) {
-    if (row < 0 || row > 7 || col < 0 || col > 7) return;
+void Board::setPieceAt(int row, int col, Object* piece)
+{
+    if (row < 0 || row >= 8 || col < 0 || col >= 8)
+        return;
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            if (grid[i][j] == piece) {
+            if (grid[i][j] == piece && piece != nullptr) {
                 grid[i][j] = nullptr;
-                break;
             }
         }
     }
@@ -54,74 +69,137 @@ void Board::setPieceAt(int row, int col, Object* piece) {
     grid[row][col] = piece;
 
     if (piece != nullptr) {
-        float tileSize = 1.0f;
-        float startX = -3.5f * tileSize;
-        float startZ = -3.5f * tileSize;
+        piece->position = getSquarePosition(row, col);
+        piece->setMovementEnabled(true);
 
-        float x = startX + col * tileSize;
-        float z = startZ + row * tileSize;
-        float pieceY = 0.05f;
-
-        piece->position = glm::vec3(x, pieceY, z);
         addChild(piece);
     }
 }
 
-void Board::setupInitialPieces(std::vector<Object*> whitePieces, std::vector<Object*> blackPieces) {
-    //16 peças pretas
+void Board::setupInitialPieces(
+    std::vector<Object*> whitePieces,
+    std::vector<Object*> blackPieces
+) {
     for (int j = 0; j < 8; j++) {
         setPieceAt(0, j, blackPieces[j]);
         setPieceAt(1, j, blackPieces[8 + j]);
     }
 
-    //meio do tabuleiro
-    for (int i = 2; i <= 5; i++) {
-        for (int j = 0; j < 8; j++) {
-            grid[i][j] = nullptr;
-        }
-    }
-
-    //  as 16 peças brancas
     for (int j = 0; j < 8; j++) {
         setPieceAt(6, j, whitePieces[8 + j]);
         setPieceAt(7, j, whitePieces[j]);
     }
 }
 
-void Board::setHoveredSquare(int row, int col) {
+glm::vec3 Board::getSquarePosition(int row, int col) const
+{
+    float x = -3.5f + col;
+    float z = -3.5f + row;
 
-    // Verifica se está dentro do tabuleiro
+    return glm::vec3(x, 0.05f, z);
+}
+
+bool Board::isSquareEmpty(int row, int col) const
+{
+    if (row < 0 || row >= 8 || col < 0 || col >= 8)
+        return false;
+
+    return grid[row][col] == nullptr;
+}
+
+void Board::highlightOccupiedSquares()
+{
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+
+            if (grid[i][j] == nullptr)
+                continue;
+
+            glm::vec4 color =
+                ((i + j) % 2 == 0)
+                ? occupiedLightColor
+                : occupiedDarkColor;
+
+            squares[i][j].setColor(color);
+        }
+    }
+}
+
+void Board::clearMoveHighlights()
+{
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+
+            glm::vec4 color =
+                ((i + j) % 2 == 0)
+                ? lightColor
+                : darkColor;
+
+            squares[i][j].setColor(color);
+        }
+    }
+}
+
+bool Board::movePieceInGrid(
+    int fromRow,
+    int fromCol,
+    int toRow,
+    int toCol
+) {
+    if (fromRow < 0 || fromRow >= 8 ||
+        fromCol < 0 || fromCol >= 8 ||
+        toRow < 0 || toRow >= 8 ||
+        toCol < 0 || toCol >= 8)
+        return false;
+
+    if (grid[fromRow][fromCol] == nullptr ||
+        grid[toRow][toCol] != nullptr)
+        return false;
+
+    Object* piece = grid[fromRow][fromCol];
+
+    grid[fromRow][fromCol] = nullptr;
+    grid[toRow][toCol] = piece;
+
+    return true;
+}
+void Board::setHoveredSquare(int row, int col)
+{
     if (row < 0 || row >= 8 || col < 0 || col >= 8) {
         clearHover();
         return;
     }
 
-    // Se continua na mesma casa, não precisa atualizar
     if (row == hoveredRow && col == hoveredCol)
         return;
 
-    // Restaura a cor da casa anterior
     clearHover();
 
-    // Aplica a cor azul na nova casa
     squares[row][col].setColor(hoverColor);
 
-    // Armazena a posição atual
     hoveredRow = row;
     hoveredCol = col;
 }
 
-
-void Board::clearHover() {
-
+void Board::clearHover()
+{
     if (hoveredRow == -1 || hoveredCol == -1)
         return;
 
-    // Restaura a cor original considerando o padrão do tabuleiro
-    glm::vec4 originalColor =
-        ((hoveredRow + hoveredCol) % 2 == 0)
-        ? lightColor
-        : darkColor;
+    glm::vec4 originalColor;
+
+    if (movementMode && grid[hoveredRow][hoveredCol] != nullptr) {
+        originalColor =
+            ((hoveredRow + hoveredCol) % 2 == 0)
+            ? occupiedLightColor
+            : occupiedDarkColor;
+    }
+    else {
+        originalColor =
+            ((hoveredRow + hoveredCol) % 2 == 0)
+            ? lightColor
+            : darkColor;
+    }
 
     squares[hoveredRow][hoveredCol].setColor(originalColor);
 
@@ -129,4 +207,7 @@ void Board::clearHover() {
     hoveredCol = -1;
 }
 
-
+void Board::setMovementMode(bool active)
+{
+    movementMode = active;
+}
