@@ -512,7 +512,7 @@ float lastFrame = 0.0f;
             cameraPos += right * speedFP * deltaTime;
 
 
-        cameraPos.y = 0.8f;
+        cameraPos.y = 1.5f;
         cameraTarget = cameraPos + direction;
 
     }
