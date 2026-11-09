@@ -278,3 +278,4 @@ void Board::setMovementMode(bool active)
 {
     movementMode = active;
 }
+

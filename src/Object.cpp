@@ -188,3 +188,5 @@ bool Object::isSelected() const
 {
     return movementState != MovementState::Idle;
 }
+
+

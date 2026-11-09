@@ -68,9 +68,9 @@ void Moviments::update(GLFWwindow* window, float deltaTime) {
     }
 //ativar e desativar mouse para movimentar a camera
     bool mKeyTriggered = (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
-    if (mKeyTriggered && !mKeyPressionadaUltimoFrame) {
+    if (mKeyTriggered && !mKeyPressionadaUltimoFrame && emPrimeiraPessoa) {
         mouseAtivo = !mouseAtivo;
-        if (mouseAtivo) {
+        if (mouseAtivo && emPrimeiraPessoa) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         } else {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

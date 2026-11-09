@@ -17,7 +17,6 @@ class Moviments
 
     // Retorna a matriz de visualização atualizada para o shader
     glm::mat4 getViewMatrix();
-
     // Getters úteis
     bool isInFirstPerson() const { return emPrimeiraPessoa; }
     bool isTransitioning() const { return estaTransicionando; }

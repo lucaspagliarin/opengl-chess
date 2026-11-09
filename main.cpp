@@ -22,9 +22,9 @@
 #include <iostream>
 
 bool firstMouse = true;
-
 float lastX = 512.0f;
 float lastY = 384.0f;
+
 //função de retorno deslocamento do mouse
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
@@ -50,16 +50,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
     Moviments::globalXOffset = xoffset * sensitivity;
     Moviments::globalYOffset = yoffset * sensitivity;
-}
-//retorno cordenadas click
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        std::cout << "Botão esquerdo clicado!" << std::endl;
-
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-        std::cout << "X: " << xpos << " | Y: " << ypos << std::endl;
-    }
 }
 
 std::pair<int, int> getBoardCoords(double mouseX, double mouseY, int larguraInt, int alturaInt, glm::mat4 projection, glm::mat4 view) {
@@ -115,7 +105,7 @@ std::pair<double, double> getMousePosition(GLFWwindow* window, bool mouseAtivo) 
     int largura, altura;
     glfwGetWindowSize(window, &largura, &altura);
 
-    if (mouseAtivo) {
+    if (Moviments::mouseAtivo) {
         return {
             largura / 2.0,
             altura / 2.0
@@ -174,11 +164,10 @@ void drawCrosshair()
 
 int main() {
     // Cria janela e inicializa OpenGL
-    Application app(1024, 768, "Cubos OOP");
+    Application app(1024, 768, "OpenGL_Chess");
     if (!app.init()) return -1;
 
     glfwSetCursorPosCallback(app.getWindow(), mouse_callback);
-    glfwSetMouseButtonCallback(app.getWindow(), mouse_button_callback);
 
     Moviments cameraMovs;
     // Shader
@@ -227,9 +216,6 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(app.getWindow())) {
 
-        if (glfwGetKey(app.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-           glfwSetWindowShouldClose(app.getWindow(), true);
-
         // Limpa tela e depth buffer
         glClearColor(0.45f, 0.45f, 0.45f, 1.0f);
 
@@ -272,35 +258,15 @@ float lastFrame = 0.0f;
     // Posição do mouse ou da mira central
     auto [mouseX, mouseY] = getMousePosition(app.getWindow(), Moviments::mouseAtivo);
 
-    int largura, altura;
-    glfwGetWindowSize(app.getWindow(), &largura, &altura);
-
     // Identifica a casa apontada
     auto [i, j] = getBoardCoords(
         mouseX,
         mouseY,
-        largura,
-        altura,
+        larguraInt,
+        alturaInt,
         projection,
         view
     );
-
-        bool mouseLeftPressed =
-        glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-
-        static bool clickUltimoFrame = false;
-
-        if (mouseLeftPressed && !clickUltimoFrame) {
-
-            if (i >= 0 && i < 8 && j >= 0 && j < 8) {
-                std::cout << "Casa clicada -> Linha: " << i
-                          << " | Coluna: " << j << std::endl;
-            } else {
-                std::cout << "Clicou fora do tabuleiro!" << std::endl;
-            }
-        }
-
-        clickUltimoFrame = mouseLeftPressed;
 
         // Atualiza o hover
         if(!cameraMovs.isTransitioning()){
@@ -378,10 +344,9 @@ float lastFrame = 0.0f;
 
 
         // Detecta o clique do mouse.
-        mouseLeftPressed =
-            glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+        bool mouseLeftPressed = glfwGetMouseButton(app.getWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
-        clickUltimoFrame = false;
+       static bool clickUltimoFrame = false;
 
         if (mouseLeftPressed && !clickUltimoFrame) {
 
@@ -406,14 +371,7 @@ float lastFrame = 0.0f;
                     glfwGetCursorPos(app.getWindow(), &mouseX, &mouseY);
                 }
 
-                auto [i, j] = getBoardCoords(
-                    mouseX,
-                    mouseY,
-                    larguraInt,
-                    alturaInt,
-                    projection,
-                    view
-                );
+
 
                 // Só processa cliques dentro do tabuleiro.
                 if (i >= 0 && i < 8 && j >= 0 && j < 8) {
@@ -484,8 +442,6 @@ float lastFrame = 0.0f;
 
         clickUltimoFrame = mouseLeftPressed;
 
-
-
         // Bind texturas
         tex1.bind(0);
         //tex2.bind(1);
@@ -494,7 +450,7 @@ float lastFrame = 0.0f;
         tabuleiro.draw(shader,model);
 
         // Crosshair
-        if (Moviments::mouseAtivo)
+        if (Moviments::mouseAtivo && cameraMovs.isInFirstPerson())
         {
             crosshairShader.use();
             drawCrosshair();
