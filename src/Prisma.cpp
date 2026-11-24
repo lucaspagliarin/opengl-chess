@@ -7,16 +7,36 @@
 // Largura: eixo X.
 
 float verticesPrisma[] = {
+    // pos X, Y, Z       // UV          // normal
     // Face frontal (Z positivo)
-    // pos X, Y, Z       // UV
-    -0.5f, -0.5f,  0.5f,  0.0f, 1.0f, // 0 - base esquerda
-     0.5f, -0.5f,  0.5f,  1.0f, 1.0f, // 1 - base direita
-     0.0f,  0.5f,  0.5f,  0.5f, 0.0f, // 2 - topo
+    -0.5f, -0.5f,  0.5f,  0.0f, 1.0f,   0.0f,  0.0f,  1.0f, // 0 - base esquerda
+     0.5f, -0.5f,  0.5f,  1.0f, 1.0f,   0.0f,  0.0f,  1.0f, // 1 - base direita
+     0.0f,  0.5f,  0.5f,  0.5f, 0.0f,   0.0f,  0.0f,  1.0f, // 2 - topo
 
     // Face traseira (Z negativo)
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // 3
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f, // 4
-     0.0f,  0.5f, -0.5f,  0.5f, 0.0f  // 5
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,   0.0f,  0.0f, -1.0f, // 3
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,   0.0f,  0.0f, -1.0f, // 4
+     0.0f,  0.5f, -0.5f,  0.5f, 0.0f,   0.0f,  0.0f, -1.0f, // 5
+
+    // Face inferior
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,   0.0f, -1.0f,  0.0f, // 6
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,   0.0f, -1.0f,  0.0f, // 7
+     0.5f, -0.5f,  0.5f,  1.0f, 1.0f,   0.0f, -1.0f,  0.0f, // 8
+    -0.5f, -0.5f,  0.5f,  0.0f, 1.0f,   0.0f, -1.0f,  0.0f, // 9
+
+    // Face lateral esquerda (inclinada)
+    // normal = (-1, 0.5, 0) normalizada
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  -0.894427f, 0.447214f, 0.0f, // 10
+    -0.5f, -0.5f,  0.5f,  1.0f, 1.0f,  -0.894427f, 0.447214f, 0.0f, // 11
+     0.0f,  0.5f,  0.5f,  1.0f, 0.0f,  -0.894427f, 0.447214f, 0.0f, // 12
+     0.0f,  0.5f, -0.5f,  0.0f, 0.0f,  -0.894427f, 0.447214f, 0.0f, // 13
+
+    // Face lateral direita (inclinada)
+    // normal = (1, 0.5, 0) normalizada
+     0.5f, -0.5f,  0.5f,  0.0f, 1.0f,   0.894427f, 0.447214f, 0.0f, // 14
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,   0.894427f, 0.447214f, 0.0f, // 15
+     0.0f,  0.5f, -0.5f,  1.0f, 0.0f,   0.894427f, 0.447214f, 0.0f, // 16
+     0.0f,  0.5f,  0.5f,  0.0f, 0.0f,   0.894427f, 0.447214f, 0.0f  // 17
 };
 
 unsigned int indicesPrisma[] = {
@@ -27,16 +47,16 @@ unsigned int indicesPrisma[] = {
     5, 4, 3,
 
     // Face inferior
-    3, 4, 1,
-    1, 0, 3,
+    6, 7, 8,
+    8, 9, 6,
 
     // Face lateral esquerda
-    3, 0, 2,
-    2, 5, 3,
+    10, 11, 12,
+    12, 13, 10,
 
     // Face lateral direita
-    1, 4, 5,
-    5, 2, 1
+    14, 15, 16,
+    16, 17, 14
 };
 
 Prisma::Prisma(
@@ -79,16 +99,23 @@ void Prisma::init() {
     // Posicao
     glVertexAttribPointer(
         0, 3, GL_FLOAT, GL_FALSE,
-        5 * sizeof(float), (void*)0
+        8 * sizeof(float), (void*)0
     );
     glEnableVertexAttribArray(0);
 
     // Coordenadas de textura
     glVertexAttribPointer(
         1, 2, GL_FLOAT, GL_FALSE,
-        5 * sizeof(float), (void*)(3 * sizeof(float))
+        8 * sizeof(float), (void*)(3 * sizeof(float))
     );
     glEnableVertexAttribArray(1);
+
+    // Normais
+    glVertexAttribPointer(
+        2, 3, GL_FLOAT, GL_FALSE,
+        8 * sizeof(float), (void*)(5 * sizeof(float))
+    );
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 }

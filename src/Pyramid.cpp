@@ -43,17 +43,44 @@ void Pyramid::init()
     float halfBase = baseSize / 2.0f;
     float halfHeight = height / 2.0f;
 
-    // Cada vértice contém XYZ + UV.
-    // 4 cantos da base e 1 ponta superior.
+    // Normais das faces laterais. Cada face ï¿½ inclinada, entï¿½o a normal
+    // tem uma parte horizontal (para fora) e uma parte vertical (para cima).
+    glm::vec3 nFront = glm::normalize(glm::vec3(0.0f,       halfBase, -height));
+    glm::vec3 nRight = glm::normalize(glm::vec3(height,     halfBase,  0.0f));
+    glm::vec3 nBack  = glm::normalize(glm::vec3(0.0f,       halfBase,  height));
+    glm::vec3 nLeft  = glm::normalize(glm::vec3(-height,    halfBase,  0.0f));
+
+    // Cada vï¿½rtice contï¿½m XYZ + UV + normal (8 floats, igual ao Cube).
+    // Como cada face tem sua prï¿½pria normal, os vï¿½rtices dos cantos sï¿½o
+    // duplicados: um conjunto para a base e um para cada face lateral.
     float vertexData[] = {
-        // Posição X, Y, Z     U, V
+        // Posiï¿½ï¿½o X, Y, Z                U, V         Normal
 
-        -halfBase, -halfHeight, -halfBase, 0.0f, 0.0f,
-         halfBase, -halfHeight, -halfBase, 1.0f, 0.0f,
-         halfBase, -halfHeight,  halfBase, 1.0f, 1.0f,
-        -halfBase, -halfHeight,  halfBase, 0.0f, 1.0f,
+        // Base (normal para baixo)
+        -halfBase, -halfHeight, -halfBase, 0.0f, 0.0f,  0.0f, -1.0f, 0.0f,  // 0
+         halfBase, -halfHeight, -halfBase, 1.0f, 0.0f,  0.0f, -1.0f, 0.0f,  // 1
+         halfBase, -halfHeight,  halfBase, 1.0f, 1.0f,  0.0f, -1.0f, 0.0f,  // 2
+        -halfBase, -halfHeight,  halfBase, 0.0f, 1.0f,  0.0f, -1.0f, 0.0f,  // 3
 
-         0.0f,      halfHeight, 0.0f,      0.5f, 0.5f
+        // Face frontal (Z negativo)
+        -halfBase, -halfHeight, -halfBase, 0.0f, 0.0f,  nFront.x, nFront.y, nFront.z,  // 4
+         halfBase, -halfHeight, -halfBase, 1.0f, 0.0f,  nFront.x, nFront.y, nFront.z,  // 5
+         0.0f,      halfHeight,  0.0f,     0.5f, 0.5f,  nFront.x, nFront.y, nFront.z,  // 6
+
+        // Face lateral direita (X positivo)
+         halfBase, -halfHeight, -halfBase, 1.0f, 0.0f,  nRight.x, nRight.y, nRight.z,  // 7
+         halfBase, -halfHeight,  halfBase, 1.0f, 1.0f,  nRight.x, nRight.y, nRight.z,  // 8
+         0.0f,      halfHeight,  0.0f,     0.5f, 0.5f,  nRight.x, nRight.y, nRight.z,  // 9
+
+        // Face traseira (Z positivo)
+         halfBase, -halfHeight,  halfBase, 1.0f, 1.0f,  nBack.x, nBack.y, nBack.z,  // 10
+        -halfBase, -halfHeight,  halfBase, 0.0f, 1.0f,  nBack.x, nBack.y, nBack.z,  // 11
+         0.0f,      halfHeight,  0.0f,     0.5f, 0.5f,  nBack.x, nBack.y, nBack.z,  // 12
+
+        // Face lateral esquerda (X negativo)
+        -halfBase, -halfHeight,  halfBase, 0.0f, 1.0f,  nLeft.x, nLeft.y, nLeft.z,  // 13
+        -halfBase, -halfHeight, -halfBase, 0.0f, 0.0f,  nLeft.x, nLeft.y, nLeft.z,  // 14
+         0.0f,      halfHeight,  0.0f,     0.5f, 0.5f,  nLeft.x, nLeft.y, nLeft.z   // 15
     };
 
     vertices.assign(
@@ -61,22 +88,22 @@ void Pyramid::init()
         vertexData + sizeof(vertexData) / sizeof(float)
     );
 
-    // Base quadrada: 2 triângulos.
     indices = {
+        // Base quadrada: 2 triï¿½ngulos.
         0, 2, 1,
         0, 3, 2,
 
         // Face frontal
-        0, 4, 1,
+        4, 6, 5,
 
         // Face lateral direita
-        1, 4, 2,
+        7, 9, 8,
 
         // Face traseira
-        2, 4, 3,
+        10, 12, 11,
 
         // Face lateral esquerda
-        3, 4, 0
+        13, 15, 14
     };
 
     indexCount = static_cast<unsigned int>(indices.size());
@@ -103,20 +130,28 @@ void Pyramid::init()
         GL_STATIC_DRAW
     );
 
-    // Posição XYZ.
+    // Posiï¿½ï¿½o XYZ.
     glVertexAttribPointer(
         0, 3, GL_FLOAT, GL_FALSE,
-        5 * sizeof(float), (void*)0
+        8 * sizeof(float), (void*)0
     );
     glEnableVertexAttribArray(0);
 
     // Coordenadas UV.
     glVertexAttribPointer(
         1, 2, GL_FLOAT, GL_FALSE,
-        5 * sizeof(float),
+        8 * sizeof(float),
         (void*)(3 * sizeof(float))
     );
     glEnableVertexAttribArray(1);
+
+    // Normais.
+    glVertexAttribPointer(
+        2, 3, GL_FLOAT, GL_FALSE,
+        8 * sizeof(float),
+        (void*)(5 * sizeof(float))
+    );
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 }

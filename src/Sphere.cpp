@@ -74,6 +74,12 @@ void Sphere::init()
             vertices.push_back(
                 (float)i / stacks
             );
+
+            // Normal: numa esfera centrada na origem, e o proprio
+            // vetor posicao normalizado (aponta do centro para fora)
+            vertices.push_back(x / radius);
+            vertices.push_back(y / radius);
+            vertices.push_back(z / radius);
         }
     }
 
@@ -137,7 +143,7 @@ void Sphere::init()
         3,
         GL_FLOAT,
         GL_FALSE,
-        5 * sizeof(float),
+        8 * sizeof(float),
         (void*)0
     );
     glEnableVertexAttribArray(0);
@@ -148,10 +154,21 @@ void Sphere::init()
         2,
         GL_FLOAT,
         GL_FALSE,
-        5 * sizeof(float),
+        8 * sizeof(float),
         (void*)(3 * sizeof(float))
     );
     glEnableVertexAttribArray(1);
+
+    // Atributo 2: normal NX, NY, NZ
+    glVertexAttribPointer(
+        2,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        8 * sizeof(float),
+        (void*)(5 * sizeof(float))
+    );
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 }

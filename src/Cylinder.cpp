@@ -44,19 +44,23 @@ void Cylinder::init()
     const float PI = 3.14159265359f;
     const float halfHeight = height / 2.0f;
 
-    // Cada vértice possui:
-    // posição X, Y, Z e coordenadas de textura U, V.
+    // Cada vÃ©rtice possui (8 floats, mesmo layout do Cube):
+    // posiÃ§Ã£oo X, Y, Z, coordenadas de textura U, V e normal NX, NY, NZ.
     auto addVertex = [&](float x, float y, float z,
-                         float u, float v)
+                         float u, float v,
+                         float nx, float ny, float nz)
     {
         vertices.push_back(x);
         vertices.push_back(y);
         vertices.push_back(z);
         vertices.push_back(u);
         vertices.push_back(v);
+        vertices.push_back(nx);
+        vertices.push_back(ny);
+        vertices.push_back(nz);
     };
 
-    // 1. Superfície lateral.
+    // 1. SuperfÃ­cie lateral.
     // Criamos um anel inferior e outro superior.
     for (int i = 0; i <= segments; i++)
     {
@@ -66,18 +70,29 @@ void Cylinder::init()
         float c = std::cos(theta);
         float s = std::sin(theta);
 
+        // Normal da lateral: aponta para fora do cilindro.
+        // Se os raios forem diferentes (tronco de cone), a normal
+        // ganha tambÃ©m uma componente em Y, proporcional a inclinaÃ§Ã£o.
+        glm::vec3 n = glm::normalize(glm::vec3(
+            c * height,
+            bottomRadius - topRadius,
+            s * height
+        ));
+
         addVertex(
             bottomRadius * c, -halfHeight,
-            bottomRadius * s, t, 0.0f
+            bottomRadius * s, t, 0.0f,
+            n.x, n.y, n.z
         );
 
         addVertex(
             topRadius * c, halfHeight,
-            topRadius * s, t, 1.0f
+            topRadius * s, t, 1.0f,
+            n.x, n.y, n.z
         );
     }
 
-    // Liga os anéis formando os triângulos laterais.
+    // Liga os anï¿½is formando os triï¿½ngulos laterais.
     for (int i = 0; i < segments; i++)
     {
         unsigned int b0 = i * 2;
@@ -96,12 +111,14 @@ void Cylinder::init()
 
     // 2. Tampa inferior.
     unsigned int bottomCenter =
-        static_cast<unsigned int>(vertices.size() / 5);
+        static_cast<unsigned int>(vertices.size() / 8);
 
-    addVertex(0.0f, -halfHeight, 0.0f, 0.5f, 0.5f);
+    // Tampas usam vÃ©rtices prÃ³prios (nÃ£o compartilhados com a lateral),
+    // assim a aresta fica "dura" e a normal Ã© constante em toda a tampa.
+    addVertex(0.0f, -halfHeight, 0.0f, 0.5f, 0.5f, 0.0f, -1.0f, 0.0f);
 
     unsigned int bottomRing =
-        static_cast<unsigned int>(vertices.size() / 5);
+        static_cast<unsigned int>(vertices.size() / 8);
 
     for (int i = 0; i <= segments; i++)
     {
@@ -114,7 +131,8 @@ void Cylinder::init()
             -halfHeight,
             bottomRadius * s,
             0.5f + 0.5f * c,
-            0.5f + 0.5f * s
+            0.5f + 0.5f * s,
+            0.0f, -1.0f, 0.0f
         );
     }
 
@@ -127,12 +145,12 @@ void Cylinder::init()
 
     // 3. Tampa superior.
     unsigned int topCenter =
-        static_cast<unsigned int>(vertices.size() / 5);
+        static_cast<unsigned int>(vertices.size() / 8);
 
-    addVertex(0.0f, halfHeight, 0.0f, 0.5f, 0.5f);
+    addVertex(0.0f, halfHeight, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f);
 
     unsigned int topRing =
-        static_cast<unsigned int>(vertices.size() / 5);
+        static_cast<unsigned int>(vertices.size() / 8);
 
     for (int i = 0; i <= segments; i++)
     {
@@ -145,7 +163,8 @@ void Cylinder::init()
             halfHeight,
             topRadius * s,
             0.5f + 0.5f * c,
-            0.5f + 0.5f * s
+            0.5f + 0.5f * s,
+            0.0f, 1.0f, 0.0f
         );
     }
 
@@ -158,7 +177,7 @@ void Cylinder::init()
 
     indexCount = static_cast<unsigned int>(indices.size());
 
-    // Envia os vértices e índices para a GPU.
+    // Envia os vï¿½rtices e ï¿½ndices para a GPU.
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -181,27 +200,35 @@ void Cylinder::init()
         GL_STATIC_DRAW
     );
 
-    // Atributo 0: posição XYZ.
+    // Atributo 0: posiï¿½ï¿½o XYZ.
     glVertexAttribPointer(
         0, 3, GL_FLOAT, GL_FALSE,
-        5 * sizeof(float), (void*)0
+        8 * sizeof(float), (void*)0
     );
     glEnableVertexAttribArray(0);
 
     // Atributo 1: coordenadas UV.
     glVertexAttribPointer(
         1, 2, GL_FLOAT, GL_FALSE,
-        5 * sizeof(float),
+        8 * sizeof(float),
         (void*)(3 * sizeof(float))
     );
     glEnableVertexAttribArray(1);
+
+    // Atributo 2: normal NX, NY, NZ.
+    glVertexAttribPointer(
+        2, 3, GL_FLOAT, GL_FALSE,
+        8 * sizeof(float),
+        (void*)(5 * sizeof(float))
+    );
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 }
 
 void Cylinder::draw(Shader& shader, glm::mat4 model)
 {
-    // Aplica as transformações do objeto.
+    // Aplica as transformaï¿½ï¿½es do objeto.
     model = glm::translate(model, position);
 
     if (angle != 0.0f)
@@ -218,7 +245,7 @@ void Cylinder::draw(Shader& shader, glm::mat4 model)
     shader.use();
     shader.setMat4("model", model);
 
-    // Ativa o modo de cor sólida somente para este objeto.
+    // Ativa o modo de cor sï¿½lida somente para este objeto.
     shader.setInt("useSolidColor", 1);
     shader.setVec4("solidColor", color);
 
@@ -231,7 +258,6 @@ void Cylinder::draw(Shader& shader, glm::mat4 model)
     );
     glBindVertexArray(0);
 
-    // Restaura o modo de textura para os próximos objetos.
+    // Restaura o modo de textura para os prï¿½ximos objetos.
     shader.setInt("useSolidColor", 0);
 }
-

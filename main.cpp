@@ -163,7 +163,7 @@ void drawCrosshair()
 }
 
 // lighting
-glm::vec3 lightPos(2.2f, 2.5f, 3.0f);
+glm::vec3 lightPos(0.0f, 3.5f, 5.0f);
 
 int main() {
     // Cria janela e inicializa OpenGL
@@ -184,7 +184,7 @@ int main() {
 
     //shader.setInt("texture1", 0);
     shader.setVec4("objectColor", 1.0f, 1.0f, 0.31f, 1.0f);
-    shader.setVec4("lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
+    shader.setVec4("lightColor",1.0f, 0.9f, 0.85f, 1.0f);
     shader.setVec3("lightPos", lightPos);
 
 
@@ -475,10 +475,10 @@ int main() {
         tex1.bind(0);
         //tex2.bind(1);
 
-        //pecas.draw(shader, model);
-        //tabuleiro.draw(shader,model);
-        cubo.draw(shader, model);
-        cubo2.draw(shader, model);
+        pecas.draw(shader, model);
+        tabuleiro.draw(shader,model);
+        //cubo.draw(shader, model);
+        //cubo2.draw(shader, model);
 
         // Crosshair
         if (Moviments::mouseAtivo && cameraMovs.isInFirstPerson())
