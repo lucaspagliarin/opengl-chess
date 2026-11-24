@@ -50,7 +50,8 @@ void Moviments::update(GLFWwindow* window, float deltaTime) {
         }
     }
     pKeyPressionadaUltimoFrame = pKeyTriggered;
-//calculo do fator de curva e atualização da camera
+
+    //calculo do fator de curva e atualização da camera
     if (estaTransicionando) {
         t += deltaTime / transitionDuration;
         if (t >= 1.0f) {
@@ -66,7 +67,8 @@ void Moviments::update(GLFWwindow* window, float deltaTime) {
         cameraPos = glm::mix(cameraPosInicial, cameraPosDestino, fatorCurva);
         cameraTarget = glm::mix(cameraTargetInicial, cameraTargetDestino, fatorCurva);
     }
-//ativar e desativar mouse para movimentar a camera
+
+    //ativar e desativar mouse para movimentar a camera
     bool mKeyTriggered = (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
     if (mKeyTriggered && !mKeyPressionadaUltimoFrame && emPrimeiraPessoa) {
         mouseAtivo = !mouseAtivo;
@@ -81,7 +83,8 @@ void Moviments::update(GLFWwindow* window, float deltaTime) {
     if (emPrimeiraPessoa && !estaTransicionando) {
         glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
         glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
-//utiliza o offset da movimentação do mouse para rotacionar a camera
+
+        //utiliza o offset da movimentação do mouse para rotacionar a camera
         if (mouseAtivo && (globalXOffset != 0.0f || globalYOffset != 0.0f)) {
             glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), -globalXOffset, glm::vec3(0.0f, 1.0f, 0.0f));
             direction = glm::vec3(rotX * glm::vec4(direction, 0.0f));
@@ -95,7 +98,9 @@ void Moviments::update(GLFWwindow* window, float deltaTime) {
         }
 
         glm::vec3 moveDirXZ = glm::normalize(glm::vec3(direction.x, 0.0f, direction.z));
-//movimentação eixo XZ
+
+        //movimentação eixo XZ
+
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             cameraPos += moveDirXZ * speedFP * deltaTime;
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -110,7 +115,8 @@ void Moviments::update(GLFWwindow* window, float deltaTime) {
 
     }
     else if (!estaTransicionando) {
-            //movimentação camera sem ser primeira pessoa
+
+        //movimentação camera sem ser primeira pessoa
         glm::vec3 direction = glm::normalize(cameraTarget - cameraPos);
         glm::vec3 right = glm::normalize(glm::cross(direction, cameraUp));
 

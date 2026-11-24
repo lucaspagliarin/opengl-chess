@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
 Mesh::Mesh(float* vertices, int size) {
-    vertexCount = size / (5 * sizeof(float)); // 3 pos + 2 tex
+    vertexCount = size / (8 * sizeof(float)); // 3 pos + 2 tex
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -11,12 +11,16 @@ Mesh::Mesh(float* vertices, int size) {
     glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 
     // posição
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // texcoords
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // normals
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 }
 
 Mesh::~Mesh() {

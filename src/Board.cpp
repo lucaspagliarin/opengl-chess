@@ -37,7 +37,8 @@ Board::Board(glm::vec3 pos, glm::vec4 color)
 
             glm::vec4 tileColor =
                 ((i + j) % 2 == 0) ? lightColor : darkColor;
-//cria casas do tabuleiro 'ladrilhos'
+
+            //cria casas do tabuleiro 'ladrilhos'
             squares[i][j] = Cube(
                 glm::vec3(x, 0.0f, z),
                 glm::vec3(0.0f),
@@ -53,6 +54,7 @@ Board::Board(glm::vec3 pos, glm::vec4 color)
             addChild(&squares[i][j]);
         }
     }
+
     // PEÇAS BRANCAS
     Pawn* wPawns[8];
     for(int i = 0; i < 8; i++) {
@@ -230,6 +232,7 @@ bool Board::movePieceInGrid(
 
     return true;
 }
+
 void Board::setHoveredSquare(int row, int col)
 {
     if (row < 0 || row >= 8 || col < 0 || col >= 8) {

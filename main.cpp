@@ -105,7 +105,7 @@ std::pair<double, double> getMousePosition(GLFWwindow* window, bool mouseAtivo) 
     int largura, altura;
     glfwGetWindowSize(window, &largura, &altura);
 
-    if (Moviments::mouseAtivo) {
+    if (mouseAtivo) {
         return {
             largura / 2.0,
             altura / 2.0
@@ -162,6 +162,9 @@ void drawCrosshair()
     glBindVertexArray(0);
 }
 
+// lighting
+glm::vec3 lightPos(2.2f, 2.5f, 3.0f);
+
 int main() {
     // Cria janela e inicializa OpenGL
     Application app(1024, 768, "OpenGL_Chess");
@@ -179,7 +182,11 @@ int main() {
     // Carrega texturas
     Texture tex1("wood.jpg");
 
-    shader.setInt("texture1", 0);
+    //shader.setInt("texture1", 0);
+    shader.setVec4("objectColor", 1.0f, 1.0f, 0.31f, 1.0f);
+    shader.setVec4("lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
+    shader.setVec3("lightPos", lightPos);
+
 
 //grupo de peças
     Group pecas(
@@ -188,6 +195,25 @@ int main() {
         glm::vec3(1.0f),
         0.0f
     );
+
+    Cube cubo(glm::vec3(0.0f, 0.0f, 0.0f),
+          glm::vec3(0.0f, 0.0f, 0.0f),
+          glm::vec3(1.0f, 1.0f, 1.0f),
+          0.0f,
+          glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
+          true
+    );
+
+    Cube cubo2(glm::vec3(1.2f, 0.5f, 2.0f),
+          glm::vec3(0.0f, 0.0f, 0.0f),
+          glm::vec3(1.0f, 1.0f, 1.0f),
+          0.0f,
+          glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+          true
+    );
+
+    // cubo.scale(glm::vec3(5.0f, 5.0f, 5.0f));
+
     //cria tabuleiro
     Board tabuleiro(glm::vec3(0.0f),glm::vec4(1.0f,0.0f,0.0f,1.0f));
     tabuleiro.setupInitialPieces();
@@ -195,25 +221,26 @@ int main() {
     // Ativa depth test
     glEnable(GL_DEPTH_TEST);
 
-glm::mat4 view;
-//controle da tecla i
-bool iKeyPressionadaUltimoFrame = false;
+    glm::mat4 view;
+    //controle da tecla i
+    bool iKeyPressionadaUltimoFrame = false;
 
-Object* obj_Selected=nullptr;
-int selectedRow = -1;
-int selectedCol = -1;
+    Object* obj_Selected=nullptr;
+    int selectedRow = -1;
+    int selectedCol = -1;
 
-int destinationRow = -1;
-int destinationCol = -1;
+    int destinationRow = -1;
+    int destinationCol = -1;
 
-bool moveInProgress = false;
-bool moveCancelled = false;
-bool cancelInProgress = false;
+    bool moveInProgress = false;
+    bool moveCancelled = false;
+    bool cancelInProgress = false;
 
-bool escPressionadaUltimoFrame = false;
+    bool escPressionadaUltimoFrame = false;
 
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
+
     while (!glfwWindowShouldClose(app.getWindow())) {
 
         // Limpa tela e depth buffer
@@ -238,47 +265,49 @@ float lastFrame = 0.0f;
             100.0f
         );
 
-    bool iKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_I) == GLFW_PRESS);
-//volta as peças para posição inicial
-    if (iKeyTriggered && !iKeyPressionadaUltimoFrame)
-    {
-        tabuleiro.setupInitialPieces();
-    }
-    iKeyPressionadaUltimoFrame = iKeyTriggered;
-//calculo para sincronizar com a taxa de atualização
-    float currentFrame = glfwGetTime();
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
+        bool iKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_I) == GLFW_PRESS);
 
-// movimentações de camera
-   cameraMovs.update(app.getWindow(),deltaTime);
-       // Configura view
-    view = cameraMovs.getViewMatrix();
+        //volta as peças para posição inicial
+        if (iKeyTriggered && !iKeyPressionadaUltimoFrame)
+        {
+            tabuleiro.setupInitialPieces();
+        }
+        iKeyPressionadaUltimoFrame = iKeyTriggered;
 
-    // Posição do mouse ou da mira central
-    auto [mouseX, mouseY] = getMousePosition(app.getWindow(), Moviments::mouseAtivo);
+        //calculo para sincronizar com a taxa de atualização
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
-    // Identifica a casa apontada
-    auto [i, j] = getBoardCoords(
-        mouseX,
-        mouseY,
-        larguraInt,
-        alturaInt,
-        projection,
-        view
-    );
+        // movimentações de camera
+        cameraMovs.update(app.getWindow(),deltaTime);
+
+        // Configura view
+        view = cameraMovs.getViewMatrix();
+
+        // Posição do mouse ou da mira central
+        auto [mouseX, mouseY] = getMousePosition(app.getWindow(), Moviments::mouseAtivo);
+
+        // Identifica a casa apontada
+        auto [i, j] = getBoardCoords(
+            mouseX,
+            mouseY,
+            larguraInt,
+            alturaInt,
+            projection,
+            view
+        );
 
         // Atualiza o hover
         if(!cameraMovs.isTransitioning()){
-        tabuleiro.setHoveredSquare(i, j);
+            tabuleiro.setHoveredSquare(i, j);
         }
+
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
 
 
-        // =====================================================
         // CONTROLE DE SELEÇÃO E MOVIMENTAÇÃO DAS PEÇAS
-        // =====================================================
 
         // ESC cancela a seleção ou o movimento.
         // Sem peça selecionada, não executa nenhuma ação.
@@ -446,8 +475,10 @@ float lastFrame = 0.0f;
         tex1.bind(0);
         //tex2.bind(1);
 
-        pecas.draw(shader, model);
-        tabuleiro.draw(shader,model);
+        //pecas.draw(shader, model);
+        //tabuleiro.draw(shader,model);
+        cubo.draw(shader, model);
+        cubo2.draw(shader, model);
 
         // Crosshair
         if (Moviments::mouseAtivo && cameraMovs.isInFirstPerson())
