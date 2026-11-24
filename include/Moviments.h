@@ -12,33 +12,35 @@ class Moviments
     public:
     Moviments();
 
-    // Atualiza a lógica de câmera, transições e inputs a cada frame
+    // Atualiza a lï¿½gica de cï¿½mera, transiï¿½ï¿½es e inputs a cada frame
     void update(GLFWwindow* window, float deltaTime);
 
-    // Retorna a matriz de visualização atualizada para o shader
+    // Retorna a matriz de visualizaï¿½ï¿½o atualizada para o shader
     glm::mat4 getViewMatrix();
-    // Getters úteis
+    // Getters ï¿½teis
     bool isInFirstPerson() const { return emPrimeiraPessoa; }
     bool isTransitioning() const { return estaTransicionando; }
+    // Posiï¿½ï¿½o atual da cï¿½mera no mundo (usada como viewPos na luz especular)
+    glm::vec3 getPosition() const { return cameraPos; }
 
-    // Variáveis globais de controle de offset do mouse (chamadas pelo callback)
+    // Variï¿½veis globais de controle de offset do mouse (chamadas pelo callback)
     static float globalXOffset;
     static float globalYOffset;
     static bool mouseAtivo;
 
 private:
-    // Posições e Vetores da Câmera
+    // Posiï¿½ï¿½es e Vetores da Cï¿½mera
     glm::vec3 cameraPos;
     glm::vec3 cameraTarget;
     glm::vec3 cameraUp;
 
-    // Estados de Câmera
+    // Estados de Cï¿½mera
     bool emPrimeiraPessoa;
     bool estaTransicionando;
     bool pKeyPressionadaUltimoFrame;
     bool mKeyPressionadaUltimoFrame;
 
-    // Transição (Smoothstep)
+    // Transiï¿½ï¿½o (Smoothstep)
     float t;
     float transitionDuration;
     glm::vec3 cameraPosInicial;

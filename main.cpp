@@ -25,7 +25,7 @@ bool firstMouse = true;
 float lastX = 512.0f;
 float lastY = 384.0f;
 
-//função de retorno deslocamento do mouse
+//funï¿½ï¿½o de retorno deslocamento do mouse
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
     if (!Moviments::mouseAtivo){
@@ -69,7 +69,7 @@ std::pair<int, int> getBoardCoords(double mouseX, double mouseY, int larguraInt,
     glm::vec4 ray_world_near = invMatriz * ray_clip_near;
     glm::vec4 ray_world_far  = invMatriz * ray_clip_far;
 
-    // Normalização homogênea (divide pelo W)
+    // Normalizaï¿½ï¿½o homogï¿½nea (divide pelo W)
     if (ray_world_near.w != 0.0f) ray_world_near /= ray_world_near.w;
     if (ray_world_far.w  != 0.0f) ray_world_far  /= ray_world_far.w;
 
@@ -77,18 +77,18 @@ std::pair<int, int> getBoardCoords(double mouseX, double mouseY, int larguraInt,
     glm::vec3 pFar  = glm::vec3(ray_world_far);
 
 
-    // 5. Acha a direção do raio e faz a intersecção com o plano Y = 0
+    // 5. Acha a direï¿½ï¿½o do raio e faz a intersecï¿½ï¿½o com o plano Y = 0
     glm::vec3 direcaoRaio = glm::normalize(pFar - pNear);
 
     int j = -1;
     int i = -1;
 
-    // Evita divisão por zero caso o raio esteja perfeitamente paralelo ao plano
+    // Evita divisï¿½o por zero caso o raio esteja perfeitamente paralelo ao plano
     if (std::abs(direcaoRaio.y) > 0.0001f) {
         float t = -pNear.y / direcaoRaio.y;
         glm::vec3 pontoNoTabuleiro = pNear + (direcaoRaio * t);
 
-        // 6. Traduz o X e Z do mundo para os índices da sua matriz de xadrez [i][j]
+        // 6. Traduz o X e Z do mundo para os ï¿½ndices da sua matriz de xadrez [i][j]
         float startX = -3.5f;
         float startZ = -3.5f;
 
@@ -163,7 +163,7 @@ void drawCrosshair()
 }
 
 // lighting
-glm::vec3 lightPos(0.0f, 3.5f, 5.0f);
+glm::vec3 lightPos(0.0f, 3.5f, 3.0f);
 
 int main() {
     // Cria janela e inicializa OpenGL
@@ -183,12 +183,24 @@ int main() {
     Texture tex1("wood.jpg");
 
     //shader.setInt("texture1", 0);
-    shader.setVec4("objectColor", 1.0f, 1.0f, 0.31f, 1.0f);
-    shader.setVec4("lightColor",1.0f, 0.9f, 0.85f, 1.0f);
-    shader.setVec3("lightPos", lightPos);
+
+    // Propriedades da luz (Phong: ambiente + difusa + especular)
+    glm::vec3 lightColor(1.0f, 0.9f, 0.85f);
+    glm::vec3 diffuseColor = lightColor   * glm::vec3(0.9f);
+    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.5f);
+
+    shader.setVec3("light.position", lightPos);
+    shader.setVec3("light.ambient", ambientColor);
+    shader.setVec3("light.diffuse", diffuseColor);
+    shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+    // Propriedades do material (parte especular)
+    // A cor de cada objeto continua vindo do solidColor
+    shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    shader.setFloat("material.shininess", 32.0f);
 
 
-//grupo de peças
+//grupo de peï¿½as
     Group pecas(
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f),
@@ -267,25 +279,25 @@ int main() {
 
         bool iKeyTriggered = (glfwGetKey(app.getWindow(), GLFW_KEY_I) == GLFW_PRESS);
 
-        //volta as peças para posição inicial
+        //volta as peï¿½as para posiï¿½ï¿½o inicial
         if (iKeyTriggered && !iKeyPressionadaUltimoFrame)
         {
             tabuleiro.setupInitialPieces();
         }
         iKeyPressionadaUltimoFrame = iKeyTriggered;
 
-        //calculo para sincronizar com a taxa de atualização
+        //calculo para sincronizar com a taxa de atualizaï¿½ï¿½o
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // movimentações de camera
+        // movimentaï¿½ï¿½es de camera
         cameraMovs.update(app.getWindow(),deltaTime);
 
         // Configura view
         view = cameraMovs.getViewMatrix();
 
-        // Posição do mouse ou da mira central
+        // Posiï¿½ï¿½o do mouse ou da mira central
         auto [mouseX, mouseY] = getMousePosition(app.getWindow(), Moviments::mouseAtivo);
 
         // Identifica a casa apontada
@@ -306,11 +318,14 @@ int main() {
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
 
+        // Posiï¿½ï¿½o da cï¿½mera: necessï¿½ria para o cï¿½lculo da luz especular
+        shader.setVec3("viewPos", cameraMovs.getPosition());
 
-        // CONTROLE DE SELEÇÃO E MOVIMENTAÇÃO DAS PEÇAS
 
-        // ESC cancela a seleção ou o movimento.
-        // Sem peça selecionada, não executa nenhuma ação.
+        // CONTROLE DE SELEï¿½ï¿½O E MOVIMENTAï¿½ï¿½O DAS PEï¿½AS
+
+        // ESC cancela a seleï¿½ï¿½o ou o movimento.
+        // Sem peï¿½a selecionada, nï¿½o executa nenhuma aï¿½ï¿½o.
         bool escPressionada =
             glfwGetKey(app.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
 
@@ -331,12 +346,12 @@ int main() {
         escPressionadaUltimoFrame = escPressionada;
 
 
-        // Atualiza a animação da peça selecionada.
+        // Atualiza a animaï¿½ï¿½o da peï¿½a selecionada.
         if (obj_Selected != nullptr) {
 
             obj_Selected->updateMovement(deltaTime);
 
-            // A animação terminou.
+            // A animaï¿½ï¿½o terminou.
             if (!obj_Selected->isAnimating() &&
                 !obj_Selected->isSelected()) {
 
@@ -351,7 +366,7 @@ int main() {
                     );
                 }
 
-                // Limpa o estado da seleção.
+                // Limpa o estado da seleï¿½ï¿½o.
                 if (moveInProgress || cancelInProgress) {
 
                     obj_Selected = nullptr;
@@ -379,8 +394,8 @@ int main() {
 
         if (mouseLeftPressed && !clickUltimoFrame) {
 
-            // Não aceita novos cliques enquanto a peça está animando
-            // ou retornando à posição original.
+            // Nï¿½o aceita novos cliques enquanto a peï¿½a estï¿½ animando
+            // ou retornando ï¿½ posiï¿½ï¿½o original.
             bool podeInteragir =
                 obj_Selected == nullptr ||
                 (!obj_Selected->isAnimating() &&
@@ -402,18 +417,18 @@ int main() {
 
 
 
-                // Só processa cliques dentro do tabuleiro.
+                // Sï¿½ processa cliques dentro do tabuleiro.
                 if (i >= 0 && i < 8 && j >= 0 && j < 8) {
 
                     // =============================================
-                    // NENHUMA PEÇA SELECIONADA
+                    // NENHUMA PEï¿½A SELECIONADA
                     // =============================================
 
                     if (obj_Selected == nullptr) {
 
                         Object* clickedPiece = tabuleiro.grid[i][j];
 
-                        // Só permite selecionar casas ocupadas.
+                        // Sï¿½ permite selecionar casas ocupadas.
                         if (clickedPiece != nullptr) {
 
                             if (clickedPiece->selectForMovement()) {
@@ -430,13 +445,13 @@ int main() {
                     }
 
                     // =============================================
-                    // JÁ EXISTE UMA PEÇA SELECIONADA
+                    // Jï¿½ EXISTE UMA PEï¿½A SELECIONADA
                     // =============================================
 
                     else {
 
                         // Clicou novamente na casa original:
-                        // cancela a seleção.
+                        // cancela a seleï¿½ï¿½o.
                         if (i == selectedRow && j == selectedCol) {
 
                             cancelInProgress = true;
@@ -446,7 +461,7 @@ int main() {
                         }
 
                         // Clicou em uma casa vazia:
-                        // inicia a movimentação.
+                        // inicia a movimentaï¿½ï¿½o.
                         else if (tabuleiro.isSquareEmpty(i, j)) {
 
                             destinationRow = i;
@@ -463,7 +478,7 @@ int main() {
                             tabuleiro.setMovementMode(false);
                         }
 
-                        // Casa ocupada: não faz nada.
+                        // Casa ocupada: nï¿½o faz nada.
                     }
                 }
             }
